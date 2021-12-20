@@ -10,6 +10,21 @@ window_height = 540 #768
 
 dirname = os.path.dirname(__file__)
 
+def draw_point(img, x, y, clr=(0,0,255)):
+    cv2.circle(img, (x, y), 5, clr, cv2.FILLED)
+    cv2.circle(img, (x, y), 10, clr, 2)
+
+def draw_line(img, landmarks, points=[], clr=(255,255,255), point_clr=(255,255,255)):
+    for p_idx, point in enumerate(points):
+        # Draw point
+        x1, y1, _ = landmarks[point]
+        draw_point(img, x1, y1, clr=point_clr)
+        # Draw line and next point
+        if p_idx + 1 < len(points):
+            x2, y2, _ = landmarks[points[p_idx + 1]]
+            cv2.line(img, (x1, y1), (x2, y2), clr, 3)
+            draw_point(img, x2, y2, clr=point_clr)
+
 class poseDetector():
  
     def __init__(self, static_image_mode=False, model_complexity=0, smooth_landmarks=True, enable_segmentation=False, smooth_segmentation=True,
@@ -39,43 +54,17 @@ class poseDetector():
             for _, pose in self.poses.items():
                 pose['start']['angles'] = {eval(k):v for k,v in pose['start']['angles'].items()}
 
-    def drawCircle(img, x, y, clr=(0,0,255)):
-        cv2.circle(img, (x, y), 10, clr, cv2.FILLED)
-        cv2.circle(img, (x, y), 15, clr, 2)
-
-
-    def drawPoints(self, img, landmarks, points=[]):
-        white_clr = (0,0,0)
-        points.sort()
-        for p_idx, point in enumerate(points):
-            # Draw point
-            x1, y1, _ = landmarks[point]
-            self.drawCircle(img, x1, y1)
-            # Draw line and next point
-            next_p_idx = p_idx + 1
-            if next_p_idx < len(points):
-                next_point = points[next_p_idx]
-                x2, y2, _ = landmarks[next_point]
-                cv2.line(img, (x1, y1), (x2, y2), white_clr, 3)
-                self.drawCircle(img, x2, y2)
-
     def correct_pose(self, img, curr_lmks, orient, pivots, angles, angle_gap = 20.0, draw=False):
         # Init variable of user's current correct angles
         curr_corr_count = 0
         # Init dictionary of user's current not correct angles
         angs_draw = {}
         try:
-
-            # Check if current user's orientation is correct
-            
             # Check each current angle if it's same as correct
             for ang_ids, ang in angles.items():
                 # Get current user's angle from it's points
-                curr_ang = self.findAngle(ang_ids)
-                
-                # curr_ang = self.findAngle(ang_ids, curr_lmks)
-
-                # Check if current user's angle is in suitable range
+                curr_ang = self.find_angle(ang_ids, curr_lmks)
+                # Check if current user angle is in suitable range
                 if abs(curr_ang - ang) <= angle_gap:
                     curr_corr_count += 1
                     # Remove the angle that has become correct, for not drawing it later
@@ -87,58 +76,16 @@ class poseDetector():
                     angs_draw[ang_ids] = ang
                     #Draw correction if needed
                     if draw:
-                        # We will draw two lines for each incorrect angle: one line along 
-                        # which the user must correct his limb, and the second line 
-                        # displays the current position of the user's limb.
-                        for ang_draw_ids, ang_draw in angs_draw.items():
-                            # Get point from which we will draw correct and current lines. 
-                            # This point is always will be the middle point from the angle 
-                            # (second from the angle's tuple)
-                            from_x, from_y, _= curr_lmks[ang_draw_ids[1]]
-                            
-                            # self.drawCircle(img, from_x, from_y, clr=(255,255,255))
 
-                            cv2.circle(img, (from_x, from_y), 10, (255,255,255), cv2.FILLED)
-                            cv2.circle(img, (from_x, from_y), 15, (255,255,255), 2)
-
-                            # Get first or last point from angle depending on point that
-                            # we want to draw for correction.
-                            # For ELBOW and SHOULDER angles we always correct first angle's point 
-                            # (in the angle's tuple)
-                            ang_idx = 0 if ang_draw_ids[0] < 23 else 2
-                            # If difference between heights of coach's pivots is bigger than some threshold 
-                            # we should correct last angle's point, otherwise first angle's point.
-                            pivots_threshold = 0.2
-                            piv_y_diff = pivots['left']['y'] - pivots['right']['y']
-                            # If angle is on the left side and the left coach's pivot is higher than
-                            # it's right pivot --> set last angle's point.
-                            if piv_y_diff > pivots_threshold and ang_draw_ids[0] & 1:
-                                ang_idx = 2
-                            # If angle is on the right side and the right coach's pivot is higher than
-                            # it's left pivot --> set last angle's point.
-                            elif piv_y_diff < -pivots_threshold and not ang_draw_ids[0] & 1:
-                                ang_idx = 2
-                            # In all other cases set first angle's point
-                            else:
-                                ang_idx = 0
-                            # Calculate new coordinates for correction point
-                            curr_x, curr_y, _ = curr_lmks[ang_draw_ids[ang_idx]]
-                            line_length = math.sqrt((from_x - curr_x)**2 + (from_y - curr_y)**2)
-                            ang_in_degrees = math.degrees(ang_draw)
-                            to_x = int(curr_x + line_length * math.cos(ang_in_degrees))
-                            to_y = int(curr_y + line_length * math.sin(ang_in_degrees))
-                            # Draw correction point and its line
-
-                            # self.drawCircle(img, to_x, to_y, clr=(255,255,255))
-                            
-                            cv2.circle(img, (to_x, to_y), 10, (255,255,255), cv2.FILLED)
-                            cv2.circle(img, (to_x, to_y), 15, (255,255,255), 2)
-
-                            cv2.line(img, (from_x, from_y), (to_x, to_y), (0,255,0), 3)
-            
-            # Return if all user's angle is correct
+                        # Draw incorrect angle lines.
+                        for ang_draw_ids, _ in angs_draw.items():
+                            draw_line(img, curr_lmks, 
+                                    points=[ang_draw_ids[0], 
+                                            ang_draw_ids[1], 
+                                            ang_draw_ids[2]], 
+                                    clr=(0,0,255))
+            # Return if all user angles is correct
             return curr_corr_count == len(angles)
-
         except:
             print('Something going wrong in correct_pose() -- PoseModule')
             return False
@@ -164,6 +111,16 @@ class poseDetector():
             pass
         return self.lmList
  
+    def find_angle(self, ps, lmks):
+        # Get the coordinates
+        x1, y1, _ = lmks[ps[0]]
+        x2, y2, _ = lmks[ps[1]]
+        x3, y3, _ = lmks[ps[2]]
+        # Calculate the Angle
+        angle = abs(math.degrees(math.atan2(y3 - y2, x3 - x2) 
+                                - math.atan2(y1 - y2, x1 - x2)))
+        return angle
+
     def findAngle(self, ps):
         # Get the landmarks
         x1, y1, _ = self.lmList[ps[0]]
@@ -173,20 +130,6 @@ class poseDetector():
         angle = abs(math.degrees(math.atan2(y3 - y2, x3 - x2) 
                             - math.atan2(y1 - y2, x1 - x2)))
         return angle
-
-    # def findAngle(self, p1, p2, p3):
-    #     # Get the landmarks
-    #     x1, y1, _ = self.lmList[p1]
-    #     x2, y2, _ = self.lmList[p2]
-    #     x3, y3, _ = self.lmList[p3]
- 
-    #     # Calculate the Angle
-    #     angle = math.degrees(math.atan2(y3 - y2, x3 - x2) -
-    #                          math.atan2(y1 - y2, x1 - x2))
-    #     if angle < 0:
-    #         angle += 360
- 
-    #     return angle
 
     def classifyPose(self):
         '''

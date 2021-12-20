@@ -1,4 +1,4 @@
-# AIgym - fitness application with personal AI coach.
+# AIgym - fitness application with personal AI coach
 
 ### AIgym was created in order to practise yoga and workout in real time using computer vision
 - AIgym supports 2 modes: yoga and workout
@@ -17,12 +17,13 @@
 ### Remote hand control
 ![virtual_control](static/hands_control.gif)
 
-### The process of pose recognition consists of the following steps:
+### The process of training consists of the following steps:
 - Recieve video stream using OpenCV. 
 - Video frames are passed to MediaPipe Pose model that detects pose, adds landmarks and records their coordinates.
 - Landmarks coordinates are extracted, organized and passed to the model for prediction.
 - The total time of the entire training is displayed in the upper left corner within the "Pause" button (see the gifs above).
 - Yoga pose timing and workout repetitions (that user must accomplish) are displayed in the upper right corner within the "Next" button (see the gifs above).
+- Incorrect pose indication through user's body lines.
 
 
 #### This project was completed in 10 days by:
