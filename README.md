@@ -1,4 +1,4 @@
-# AIgym - fitness application with personal AI coach.
+# AIgym - fitness application with personal AI coach
 
 ### AIgym was created in order to practise yoga and workout in real time using computer vision
 - AIgym supports 2 modes: yoga and workout
