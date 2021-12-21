@@ -27,16 +27,13 @@ blue_clr = (255, 0, 0)
 
 # Init variables for first pose 
 trng_seq = list(detector.poses)
-#TODO: Get trng duration from json
+#TODO: Get training duration from json
 trng_duration = 5 * 60 # mins, secs
 pose_name = trng_seq.pop(0)
 pose_duration = detector.poses[pose_name]['duration']
 pose_angles = detector.poses[pose_name]['start']['angles']
 
-
-
 is_corr_pose = False
-# is_corr_pose = 'Unknown Pose'
 label_next_pose = 'T Pose'
 
 wtimer_left = trng_duration
@@ -152,58 +149,6 @@ main_lnms = [LEFT_SHOULDER, RIGHT_SHOULDER, LEFT_ELBOW, RIGHT_ELBOW,
             RIGHT_KNEE, LEFT_ANKLE, RIGHT_ANKLE]
 
 
-# def drawPoints(img, landmarks, points=[]):
-#     points.sort()
-#     for p_idx, point in enumerate(points):
-#         # Draw point
-#         x1, y1, _ = landmarks[point]
-#         drawCircle(img, x1, y1)
-#         # Draw line and next point
-#         next_p_idx = p_idx + 1
-#         if next_p_idx < len(points):
-#             next_point = points[next_p_idx]
-#             x2, y2, _ = landmarks[next_point]
-#             cv2.line(img, (x1, y1), (x2, y2), white_clr, 3)
-#             drawCircle(img, x2, y2)
-#             # Draw angle
-#             if next_p_idx + 1 < len(points):
-#                 angle = detector.findAngle((point, next_point, points[next_p_idx + 1]))
-#                 cv2.putText(img, str(int(angle)), (x2 - 50, y2 + 50), cv2.FONT_HERSHEY_PLAIN, 2, white_clr, 2)
-
-# def drawCircle(img, x, y, clr = red_clr):
-#     cv2.circle(img, (x, y), 10, clr, cv2.FILLED)
-#     cv2.circle(img, (x, y), 15, clr, 2)
-
-# # Congrats
-# img_glasses = cv2.imread(os.path.join(dirname, 'imgs/glasses_cig.png'), cv2.IMREAD_UNCHANGED)
-# img_glasses = cv2.resize(img_glasses, (0, 0), None, 0.25, 0.25)
-# img_cows = cv2.imread(os.path.join(dirname, 'imgs/cows.jpg'), cv2.IMREAD_UNCHANGED)
-# img_cows = cv2.resize(img_cows,(window_width,window_height))
-
-# def overlayPNG(imgBack, imgFront, pos=[0, 0]):
-#     hf, wf, cf = imgFront.shape
-#     hb, wb, cb = imgBack.shape
-#     *_, mask = cv2.split(imgFront)
-#     maskBGRA = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGRA)
-#     maskBGR = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
-#     imgRGBA = cv2.bitwise_and(imgFront, maskBGRA)
-#     imgRGB = cv2.cvtColor(imgRGBA, cv2.COLOR_BGRA2BGR)
-
-#     imgMaskFull = np.zeros((hb, wb, cb), np.uint8)
-#     imgMaskFull2 = np.ones((hb, wb, cb), np.uint8) * 255
-
-#     try:
-#         imgMaskFull[pos[1]:hf + pos[1], pos[0]:wf + pos[0], :] = imgRGB
-#         maskBGRInv = cv2.bitwise_not(maskBGR)
-#         imgMaskFull2[pos[1]:hf + pos[1], pos[0]:wf + pos[0], :] = maskBGRInv
-#     except:
-#         pass
-
-#     imgBack = cv2.bitwise_and(imgBack, imgMaskFull2)
-#     imgBack = cv2.bitwise_or(imgBack, imgMaskFull)
-
-    # return imgBack
-
 # Background video 
 bg_video_name = os.path.join(dirname, 'pose_1.mp4')
 capBackground = cv2.VideoCapture(bg_video_name)
@@ -231,30 +176,6 @@ while cap.isOpened():
         # Youga
         if yoga_active:
 
-            # Right Arm
-            angle = detector.findAngle((RIGHT_SHOULDER, RIGHT_ELBOW, RIGHT_WRIST))
-
-
-            # drawPoints(img, lmList, points=[NOSE])
-            # drawPoints(img, lmList, points=[RIGHT_SHOULDER, RIGHT_ELBOW, RIGHT_WRIST])
-
-
-            per = np.interp(angle, (210, 310), (0, 100))
-            bar = np.interp(angle, (220, 310), (450, 100))
-    
-            # Check for the dumbbell curls
-            color = (255, 0, 255)
-            if per == 100:
-                color = (0, 255, 0)
-                if dir == 0:
-                    count += 0.5
-                    dir = 1
-            if per == 0:
-                color = (0, 255, 0)
-                if dir == 1:
-                    count += 0.5
-                    dir = 0
-            # print(count)
 
 
             # TODO: Try to use async
@@ -276,18 +197,8 @@ while cap.isOpened():
                     img = np.where(condition, img, bg_image)
 
 
-            # Perform Pose landmark detection.
-            # is_corr_pose = detector.classifyPose()
-
-            
-
+            # Detect if pose is correct
             is_corr_pose = detector.correct_pose(img, lmList, pose_angles, draw=True)
-            
-            # if res:
-            #     print(time_end - time_start)
-
-
-            # Exersize sequence
 
             # Update the color (to green) with which the label will be written on the image.
             label_clr = green_clr if is_corr_pose or label_next_pose == 'Done!' else red_clr
@@ -412,15 +323,6 @@ while cap.isOpened():
                             pose_duration = detector.poses[pose_name]['duration']
                             pose_angles = detector.poses[pose_name]['start']['angles']
                             
-                    
-                            
-
-                        # if label_next_pose == trng_seq[0].capitalize() + ' Pose':
-                        #     label_next_pose = trng_seq[1].capitalize() + ' Pose'
-                        # elif label_next_pose == trng_seq[1].capitalize() + ' Pose':
-                        #     label_next_pose = trng_seq[2].capitalize() + ' Pose'
-                        # elif label_next_pose == trng_seq[2].capitalize() + ' Pose':
-                        #     label_next_pose = 'Done!'
 
                 else:
                     pinit_time = time.time()
@@ -458,6 +360,9 @@ while cap.isOpened():
             
             # Wtimer
             if wtimer_active:
+
+                print(wtimer_active)
+
                 lhand_x_in_wtimer_x = lhand_x > wtimer_pos_x and lhand_x < (wtimer_pos_x + wtimer_width)
                 lhand_y_in_wtimer_y = lhand_y > wtimer_pos_y and lhand_y < (wtimer_pos_y + wtimer_height)
                 lhand_in_wtimer = lhand_x_in_wtimer_x and lhand_y_in_wtimer_y
@@ -680,27 +585,6 @@ while cap.isOpened():
                     hand_in_ptimer_inittime = time.time()
                     ptimer_pressed = False
 
-        
-        # # Draw congrats
-        # if label_next_pose == 'Done!':
-            
-        #     # TODO: DRY
-        #     # Add background frame to segmented user's frame
-        #     condition = np.stack((results.segmentation_mask,) * 3, axis=-1) > 0.1
-        #     bg_image = np.zeros(img.shape, dtype=np.uint8)
-        #     bg_image[:] = img_cows
-        #     img = np.where(condition, img, bg_image)
-
-        #     reye_x, reye_y, _ = lmList[RIGHT_EYE_OUTER]
-        #     leye_x, leye_y, _ = lmList[LEFT_EYE_OUTER]
-
-        #     # Resize glasses relative to depth (changed distance between eyes)
-        #     glasses_w = abs(int((leye_x - reye_x) * 1.3))
-        #     glasses_h = int(glasses_w * 1.05)
-        #     img_glasses = cv2.resize(img_glasses, (glasses_w, glasses_h),fx=0,fy=0, interpolation = cv2.INTER_CUBIC)
-
-        #     img = overlayPNG(img, img_glasses, [reye_x - 20, reye_y])
-
 
         # Menu buttons
         if yoga_butt_active:
@@ -891,11 +775,6 @@ while cap.isOpened():
                     hand_in_workout_butt_inittime = time.time()
                     workout_butt_pressed = False
     
-        
-
-    # else:
-    #     img = black_matrix
-
 
     # Draw framerate
     cTime = time.time()
