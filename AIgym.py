@@ -25,15 +25,21 @@ green_clr = (0, 255, 0)
 red_clr = (0, 0, 255)
 blue_clr = (255, 0, 0)
 
-black_matrix = np.zeros((window_width, window_height), dtype=np.uint8)
+# Init variables for first pose 
+trng_seq = list(detector.poses)
+#TODO: Get trng duration from json
+trng_duration = 5 * 60 # mins, secs
+pose_name = trng_seq.pop(0)
+pose_duration = detector.poses[pose_name]['duration']
+pose_angles = detector.poses[pose_name]['start']['angles']
 
-tng_duration = 5 * 60 # mins, secs
-pose_duration = 3 # secs
 
-label = 'Unknown Pose'
+
+is_corr_pose = False
+# is_corr_pose = 'Unknown Pose'
 label_next_pose = 'T Pose'
 
-wtimer_left = tng_duration
+wtimer_left = trng_duration
 wtimer_text_size = 2
 wtimer_curr_rec_width = 0
 winit_time = time.time()
@@ -146,27 +152,27 @@ main_lnms = [LEFT_SHOULDER, RIGHT_SHOULDER, LEFT_ELBOW, RIGHT_ELBOW,
             RIGHT_KNEE, LEFT_ANKLE, RIGHT_ANKLE]
 
 
-def drawPoints(img, landmarks, points=[]):
-    points.sort()
-    for p_idx, point in enumerate(points):
-        # Draw point
-        x1, y1, _ = landmarks[point]
-        drawCircle(img, x1, y1)
-        # Draw line and next point
-        next_p_idx = p_idx + 1
-        if next_p_idx < len(points):
-            next_point = points[next_p_idx]
-            x2, y2, _ = landmarks[next_point]
-            cv2.line(img, (x1, y1), (x2, y2), white_clr, 3)
-            drawCircle(img, x2, y2)
-            # Draw angle
-            if next_p_idx + 1 < len(points):
-                angle = detector.findAngle((point, next_point, points[next_p_idx + 1]))
-                cv2.putText(img, str(int(angle)), (x2 - 50, y2 + 50), cv2.FONT_HERSHEY_PLAIN, 2, white_clr, 2)
+# def drawPoints(img, landmarks, points=[]):
+#     points.sort()
+#     for p_idx, point in enumerate(points):
+#         # Draw point
+#         x1, y1, _ = landmarks[point]
+#         drawCircle(img, x1, y1)
+#         # Draw line and next point
+#         next_p_idx = p_idx + 1
+#         if next_p_idx < len(points):
+#             next_point = points[next_p_idx]
+#             x2, y2, _ = landmarks[next_point]
+#             cv2.line(img, (x1, y1), (x2, y2), white_clr, 3)
+#             drawCircle(img, x2, y2)
+#             # Draw angle
+#             if next_p_idx + 1 < len(points):
+#                 angle = detector.findAngle((point, next_point, points[next_p_idx + 1]))
+#                 cv2.putText(img, str(int(angle)), (x2 - 50, y2 + 50), cv2.FONT_HERSHEY_PLAIN, 2, white_clr, 2)
 
-def drawCircle(img, x, y, clr = red_clr):
-    cv2.circle(img, (x, y), 10, clr, cv2.FILLED)
-    cv2.circle(img, (x, y), 15, clr, 2)
+# def drawCircle(img, x, y, clr = red_clr):
+#     cv2.circle(img, (x, y), 10, clr, cv2.FILLED)
+#     cv2.circle(img, (x, y), 15, clr, 2)
 
 # # Congrats
 # img_glasses = cv2.imread(os.path.join(dirname, 'imgs/glasses_cig.png'), cv2.IMREAD_UNCHANGED)
@@ -271,16 +277,12 @@ while cap.isOpened():
 
 
             # Perform Pose landmark detection.
-            label = detector.classifyPose()
+            # is_corr_pose = detector.classifyPose()
 
-            pose_name = 't'
-            pose_orient = detector.poses[pose_name]['start']['orientation']
-            pose_pivots = detector.poses[pose_name]['start']['pivots']
-            pose_angles = detector.poses[pose_name]['start']['angles']
+            
 
-            time_start = time.time()
-            res = detector.correct_pose(img, lmList, pose_orient, pose_pivots, pose_angles, draw=True)
-            time_end = time.time()
+            is_corr_pose = detector.correct_pose(img, lmList, pose_angles, draw=True)
+            
             # if res:
             #     print(time_end - time_start)
 
@@ -288,8 +290,7 @@ while cap.isOpened():
             # Exersize sequence
 
             # Update the color (to green) with which the label will be written on the image.
-            label_clr = red_clr if label != label_next_pose else green_clr
-            if label_next_pose == 'Done!': label_clr = green_clr
+            label_clr = green_clr if is_corr_pose or label_next_pose == 'Done!' else red_clr
 
             # Write the label on the output image. 
             cv2.putText(img, label_next_pose, (400, 75),cv2.FONT_HERSHEY_PLAIN, 2, label_clr, 2)
@@ -302,7 +303,7 @@ while cap.isOpened():
             wtimer_pos_y = 10
             wtimer_width = 300
             wtimer_height = 100
-            wtimer_width_step = wtimer_width / tng_duration
+            wtimer_width_step = wtimer_width / trng_duration
 
             if wtimer_active:
                 
@@ -372,10 +373,10 @@ while cap.isOpened():
             # Change pose timer button if it's active
             if ptimer_active:
                 # Change anything only if we detect any pose
-                if label != 'Unknown Pose':
+                if is_corr_pose:
                     # Fill pose timer button by increasing filled button's rectangle each time when
                     # we current pose is equal label_next_pose and when pose timer is not end.
-                    if ptimer_left > 0 and label == label_next_pose:
+                    if ptimer_left > 0 and is_corr_pose:
                         # Calculate time that starts right after we detect correct pose (label == label_next_pose)
                         pcurr_time = int(time.time() - pinit_time)
                         # Change filled pose timer rectangle each second. One second is 
@@ -388,17 +389,39 @@ while cap.isOpened():
                             prev_pcurr_time = pcurr_time
                             # Update timer that indicates how much time is left to end the pose.
                             ptimer_left -= 1
-                    # Reset timers and pose label if pose time is ended.
+                    
                     elif ptimer_left <= 0:
+                        # Reset timers and pose label if pose time is ended.
                         ptimer_left = pose_duration
                         ptimer_curr_rec_width = 0
 
-                        if label_next_pose == 'T Pose':
-                            label_next_pose = 'Warrior Pose'
-                        elif label_next_pose == 'Warrior Pose':
-                            label_next_pose = 'Tree Pose'
-                        elif label_next_pose == 'Tree Pose':
+                        
+                        
+                        # Check if user is done training
+                        if not trng_seq:
                             label_next_pose = 'Done!'
+                            ptimer_active = False
+                        # Reset pose variables to next pose
+                        elif is_corr_pose:
+                            is_corr_pose = False
+                            
+                            # Set next pose
+                            pose_name = trng_seq.pop(0)
+                            # Set new values to pose variables 
+                            label_next_pose = pose_name.capitalize() + ' Pose'
+                            pose_duration = detector.poses[pose_name]['duration']
+                            pose_angles = detector.poses[pose_name]['start']['angles']
+                            
+                    
+                            
+
+                        # if label_next_pose == trng_seq[0].capitalize() + ' Pose':
+                        #     label_next_pose = trng_seq[1].capitalize() + ' Pose'
+                        # elif label_next_pose == trng_seq[1].capitalize() + ' Pose':
+                        #     label_next_pose = trng_seq[2].capitalize() + ' Pose'
+                        # elif label_next_pose == trng_seq[2].capitalize() + ' Pose':
+                        #     label_next_pose = 'Done!'
+
                 else:
                     pinit_time = time.time()
 
@@ -627,13 +650,23 @@ while cap.isOpened():
                         
                         ptimer_left = pose_duration
                         ptimer_curr_rec_width = 0
-
-                        if label_next_pose == 'T Pose':
-                            label_next_pose = 'Warrior Pose'
-                        elif label_next_pose == 'Warrior Pose':
-                            label_next_pose = 'Tree Pose'
-                        elif label_next_pose == 'Tree Pose':
+                        
+                        #TODO: DRY
+                        # Check if user is done training
+                        if not trng_seq:
                             label_next_pose = 'Done!'
+                            ptimer_active = False
+
+                        # Reset pose variables to next pose
+                        else:
+
+                            # Set next pose
+                            pose_name = trng_seq.pop(0)
+                            # Set new values to pose variables 
+                            label_next_pose = pose_name.capitalize() + ' Pose'
+                            pose_duration = detector.poses[pose_name]['duration']
+                            pose_angles = detector.poses[pose_name]['start']['angles']
+
 
                         cv2.rectangle(img, 
                                 (ptimer_pos_x, ptimer_pos_y), 
@@ -724,7 +757,7 @@ while cap.isOpened():
 
                         label_next_pose = 'T Pose'
 
-                        wtimer_left = tng_duration
+                        wtimer_left = trng_duration
                         wtimer_text_size = 2
                         wtimer_curr_rec_width = 0
                         winit_time = time.time()
@@ -818,7 +851,7 @@ while cap.isOpened():
 
                         label_next_pose = 'T Pose'
 
-                        wtimer_left = tng_duration
+                        wtimer_left = trng_duration
                         wtimer_text_size = 2
                         wtimer_curr_rec_width = 0
                         winit_time = time.time()

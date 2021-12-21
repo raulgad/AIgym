@@ -54,7 +54,7 @@ class poseDetector():
             for _, pose in self.poses.items():
                 pose['start']['angles'] = {eval(k):v for k,v in pose['start']['angles'].items()}
 
-    def correct_pose(self, img, curr_lmks, orient, pivots, angles, angle_gap = 20.0, draw=False):
+    def correct_pose(self, img, curr_lmks, angles, angle_gap = 20.0, draw=False):
         # Init variable of user's current correct angles
         curr_corr_count = 0
         # Init dictionary of user's current not correct angles
@@ -84,10 +84,10 @@ class poseDetector():
                                             ang_draw_ids[1], 
                                             ang_draw_ids[2]], 
                                     clr=(0,0,255))
-            # Return if all user angles is correct
+            # Return true if all user angles is correct
             return curr_corr_count == len(angles)
         except:
-            print('Something going wrong in correct_pose() -- PoseModule')
+            print('Something going wrong in correct_pose() -> PoseModule')
             return False
         
     def findPose(self, img, draw=True):
