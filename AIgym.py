@@ -108,6 +108,8 @@ cont_butt_pressed = False
 yoga_butt_pressed = False
 workout_butt_pressed = False
 
+some_bttn_active = False
+
 # Indexes of all landmarks
 NOSE = detector.mpPose.PoseLandmark.NOSE.value
 LEFT_EYE_INNER = detector.mpPose.PoseLandmark.LEFT_EYE_INNER.value
@@ -312,6 +314,7 @@ while cap.isOpened():
                         if not trng_seq:
                             label_next_pose = 'Done!'
                             ptimer_active = False
+
                         # Reset pose variables to next pose
                         elif is_corr_pose:
                             is_corr_pose = False
@@ -360,9 +363,6 @@ while cap.isOpened():
             
             # Wtimer
             if wtimer_active:
-
-                print(wtimer_active)
-
                 lhand_x_in_wtimer_x = lhand_x > wtimer_pos_x and lhand_x < (wtimer_pos_x + wtimer_width)
                 lhand_y_in_wtimer_y = lhand_y > wtimer_pos_y and lhand_y < (wtimer_pos_y + wtimer_height)
                 lhand_in_wtimer = lhand_x_in_wtimer_x and lhand_y_in_wtimer_y
@@ -371,16 +371,19 @@ while cap.isOpened():
                 rhand_y_in_wtimer_y = rhand_y > wtimer_pos_y and rhand_y < (wtimer_pos_y + wtimer_height)
                 rhand_in_wtimer = rhand_x_in_wtimer_x and rhand_y_in_wtimer_y
 
-                if (lhand_in_wtimer or rhand_in_wtimer) and not (lhand_in_ptimer or rhand_in_ptimer):
+                # Detect if hand in button area
+                if (lhand_in_wtimer or rhand_in_wtimer) and not some_bttn_active:
                     cv2.rectangle(img, 
                                 (wtimer_pos_x, wtimer_pos_y), 
                                 (wtimer_pos_x + wtimer_width, wtimer_pos_y + wtimer_height), 
                                 green_clr, 
                                 3)
-
+                                
                     # Detect 'tap' on wtimer
                     hand_in_wtimer_curr_time = int(time.time() - hand_in_wtimer_inittime)
                     if hand_in_wtimer_curr_time >= 1 and not wtimer_pressed:
+                        # Turn off other buttons
+                        some_bttn_active = True
 
                         wtimer_tapped = True
                         exit_butt_active = True
@@ -396,6 +399,8 @@ while cap.isOpened():
                 else:
                     hand_in_wtimer_inittime = time.time()
                     wtimer_pressed = False
+                    # Turn on other buttons
+                    some_bttn_active = False
 
             # Draw pause buttons
             if wtimer_tapped:
@@ -441,16 +446,18 @@ while cap.isOpened():
                     rhand_y_in_exit_butt_y = rhand_y > exit_butt_pos_y and rhand_y < (exit_butt_pos_y + exit_butt_height)
                     rhand_in_exit_butt = rhand_x_in_exit_butt_x and rhand_y_in_exit_butt_y
 
-                    if (lhand_in_exit_butt or rhand_in_exit_butt) and not (lhand_in_cont_butt or rhand_in_cont_butt):
+                    if (lhand_in_exit_butt or rhand_in_exit_butt) and not some_bttn_active:
                         cv2.rectangle(img, 
                                     (exit_butt_pos_x, exit_butt_pos_y), 
                                     (exit_butt_pos_x + exit_butt_width, exit_butt_pos_y + exit_butt_height), 
                                     green_clr, 
                                     3)
-
+                        
                         # Detect 'tap' on exit_butt
                         hand_in_exit_butt_curr_time = int(time.time() - hand_in_exit_butt_inittime)
                         if hand_in_exit_butt_curr_time >= 1 and not exit_butt_pressed:
+                             # Turn off other buttons
+                            some_bttn_active = True
 
                             cv2.rectangle(img, 
                                     (exit_butt_pos_x, exit_butt_pos_y), 
@@ -469,6 +476,8 @@ while cap.isOpened():
                     else:
                         hand_in_exit_butt_inittime = time.time()
                         exit_butt_pressed = False
+                        # Turn on other buttons
+                        some_bttn_active = False
                 
                 
 
@@ -503,7 +512,7 @@ while cap.isOpened():
                     rhand_y_in_cont_butt_y = rhand_y > cont_butt_pos_y and rhand_y < (cont_butt_pos_y + cont_butt_height)
                     rhand_in_cont_butt = rhand_x_in_cont_butt_x and rhand_y_in_cont_butt_y
 
-                    if (lhand_in_cont_butt or rhand_in_cont_butt) and not (lhand_in_exit_butt or rhand_in_exit_butt):
+                    if (lhand_in_cont_butt or rhand_in_cont_butt) and not some_bttn_active:
                         cv2.rectangle(img, 
                                     (cont_butt_pos_x, cont_butt_pos_y), 
                                     (cont_butt_pos_x + cont_butt_width, cont_butt_pos_y + cont_butt_height), 
@@ -513,7 +522,9 @@ while cap.isOpened():
                         # Detect 'tap' on cont_butt
                         hand_in_cont_butt_curr_time = int(time.time() - hand_in_cont_butt_inittime)
                         if hand_in_cont_butt_curr_time >= 1 and not cont_butt_pressed:
-                            
+                            # Turn off other buttons
+                            some_bttn_active = True
+
                             cont_butt_active = False
                             wtimer_tapped = False
                             wtimer_active = True
@@ -530,6 +541,8 @@ while cap.isOpened():
                     else:
                         hand_in_cont_butt_inittime = time.time()
                         cont_butt_pressed = False
+                        # Turn on other buttons
+                        some_bttn_active = False
 
 
             # Ptimer
@@ -541,8 +554,8 @@ while cap.isOpened():
                 rhand_x_in_ptimer_x = rhand_x > ptimer_pos_x and rhand_x < (ptimer_pos_x + ptimer_width)
                 rhand_y_in_ptimer_y = rhand_y > ptimer_pos_y and rhand_y < (ptimer_pos_y + ptimer_height)
                 rhand_in_ptimer = rhand_x_in_ptimer_x and rhand_y_in_ptimer_y
-
-                if (lhand_in_ptimer or rhand_in_ptimer) and not (lhand_in_wtimer or rhand_in_wtimer):
+                # Detect if hand in button area
+                if (lhand_in_ptimer or rhand_in_ptimer) and not some_bttn_active:
                     cv2.rectangle(img, 
                                 (ptimer_pos_x, ptimer_pos_y), 
                                 (ptimer_pos_x + ptimer_width, ptimer_pos_y + ptimer_height), 
@@ -552,7 +565,9 @@ while cap.isOpened():
                     # Detect 'tap' on ptimer
                     hand_in_ptimer_curr_time = int(time.time() - hand_in_ptimer_inittime)
                     if hand_in_ptimer_curr_time >= 1 and not ptimer_pressed:
-                        
+                        # Turn off other buttons
+                        some_bttn_active = True
+
                         ptimer_left = pose_duration
                         ptimer_curr_rec_width = 0
                         
@@ -561,6 +576,8 @@ while cap.isOpened():
                         if not trng_seq:
                             label_next_pose = 'Done!'
                             ptimer_active = False
+
+                            some_bttn_active = False
 
                         # Reset pose variables to next pose
                         else:
@@ -584,6 +601,8 @@ while cap.isOpened():
                 else:
                     hand_in_ptimer_inittime = time.time()
                     ptimer_pressed = False
+                    # Turn on other buttons
+                    some_bttn_active = False
 
 
         # Menu buttons
@@ -624,7 +643,7 @@ while cap.isOpened():
                 rhand_y_in_yoga_butt_y = rhand_y > yoga_butt_pos_y and rhand_y < (yoga_butt_pos_y + yoga_butt_height)
                 rhand_in_yoga_butt = rhand_x_in_yoga_butt_x and rhand_y_in_yoga_butt_y
 
-                if (lhand_in_yoga_butt or rhand_in_yoga_butt) and not (lhand_in_workout_butt or rhand_in_workout_butt):
+                if (lhand_in_yoga_butt or rhand_in_yoga_butt) and not some_bttn_active:
                     cv2.rectangle(img, 
                                 (yoga_butt_pos_x, yoga_butt_pos_y), 
                                 (yoga_butt_pos_x + yoga_butt_width, yoga_butt_pos_y + yoga_butt_height), 
@@ -634,10 +653,20 @@ while cap.isOpened():
                     # Detect 'tap' on yoga_butt
                     hand_in_yoga_butt_curr_time = int(time.time() - hand_in_yoga_butt_inittime)
                     if hand_in_yoga_butt_curr_time >= 1 and not yoga_butt_pressed:
-                        
+                        # Turn off other buttons
+                        some_bttn_active = True
+
                         # Reset to yoga
                         hand_in_wtimer_inittime = 1000000000000
                         hand_in_ptimer_inittime = 1000000000000
+
+                        # Init variables for first pose 
+                        trng_seq = list(detector.poses)
+                        #TODO: Get training duration from json
+                        trng_duration = 5 * 60 # mins, secs
+                        pose_name = trng_seq.pop(0)
+                        pose_duration = detector.poses[pose_name]['duration']
+                        pose_angles = detector.poses[pose_name]['start']['angles']
 
                         label_next_pose = 'T Pose'
 
@@ -660,6 +689,8 @@ while cap.isOpened():
                         ptimer_active = True
                         ptimer_show = True
 
+                        some_bttn_active = False
+
                         exit_butt_active = False
                         cont_butt_active = False
 
@@ -680,6 +711,8 @@ while cap.isOpened():
                 else:
                     hand_in_yoga_butt_inittime = time.time()
                     yoga_butt_pressed = False
+                    # Turn on other buttons
+                    some_bttn_active = False
 
         if workout_butt_active:
             # Draw workout button
@@ -718,7 +751,7 @@ while cap.isOpened():
                 rhand_y_in_workout_butt_y = rhand_y > workout_butt_pos_y and rhand_y < (workout_butt_pos_y + workout_butt_height)
                 rhand_in_workout_butt = rhand_x_in_workout_butt_x and rhand_y_in_workout_butt_y
 
-                if (lhand_in_workout_butt or rhand_in_workout_butt) and not (lhand_in_yoga_butt or rhand_in_yoga_butt):
+                if (lhand_in_workout_butt or rhand_in_workout_butt) and not some_bttn_active:
                     cv2.rectangle(img, 
                                 (workout_butt_pos_x, workout_butt_pos_y), 
                                 (workout_butt_pos_x + workout_butt_width, workout_butt_pos_y + workout_butt_height), 
@@ -728,10 +761,20 @@ while cap.isOpened():
                     # Detect 'tap' on workout_butt
                     hand_in_workout_butt_curr_time = int(time.time() - hand_in_workout_butt_inittime)
                     if hand_in_workout_butt_curr_time >= 1 and not workout_butt_pressed:
+                        # Turn off other buttons
+                        some_bttn_active = True
                         
                         # Reset to yoga
                         hand_in_wtimer_inittime = 1000000000000
                         hand_in_ptimer_inittime = 1000000000000
+
+                        # Init variables for first pose 
+                        trng_seq = list(detector.poses)
+                        #TODO: Get training duration from json
+                        trng_duration = 5 * 60 # mins, secs
+                        pose_name = trng_seq.pop(0)
+                        pose_duration = detector.poses[pose_name]['duration']
+                        pose_angles = detector.poses[pose_name]['start']['angles']
 
                         label_next_pose = 'T Pose'
 
@@ -754,6 +797,8 @@ while cap.isOpened():
                         ptimer_active = True
                         ptimer_show = True
 
+                        some_bttn_active = False
+
                         exit_butt_active = False
                         cont_butt_active = False
 
@@ -774,6 +819,8 @@ while cap.isOpened():
                 else:
                     hand_in_workout_butt_inittime = time.time()
                     workout_butt_pressed = False
+                    # Turn on other buttons
+                    some_bttn_active = False
     
 
     # Draw framerate
