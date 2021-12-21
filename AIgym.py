@@ -165,14 +165,13 @@ while cap.isOpened():
     # Flip the frame horizontally for natural (selfie-view) visualization.
     img = cv2.flip(img, 1)
 
-    img, results = detector.findPose(img, draw=False)
-    lmList = detector.findPosition(img)
+    lmks, segmentation_mask = detector.analyze(img)
 
-    if len(lmList) != 0:
+    if len(lmks) != 0:
         
         # Hands Menu Control
-        lhand_x, lhand_y, _ = lmList[RIGHT_INDEX]
-        rhand_x, rhand_y, _ = lmList[LEFT_INDEX]
+        lhand_x, lhand_y, _ = lmks[RIGHT_INDEX]
+        rhand_x, rhand_y, _ = lmks[LEFT_INDEX]
 
 
         # Youga
@@ -193,14 +192,14 @@ while cap.isOpened():
                     # Resize video frame to be equal window's size
                     img_back = cv2.resize(img_back,(window_width,window_height),fx=0,fy=0, interpolation = cv2.INTER_CUBIC)
                     # Add background frame to segmented user's frame
-                    condition = np.stack((results.segmentation_mask,) * 3, axis=-1) > 0.1
+                    condition = np.stack((segmentation_mask,) * 3, axis=-1) > 0.1
                     bg_image = np.zeros(img.shape, dtype=np.uint8)
                     bg_image[:] = img_back
                     img = np.where(condition, img, bg_image)
 
 
             # Detect if pose is correct
-            is_corr_pose = detector.correct_pose(img, lmList, pose_angles, draw=True)
+            is_corr_pose = detector.correct_pose(img, lmks, pose_angles, draw=True)
 
             # Update the color (to green) with which the label will be written on the image.
             label_clr = green_clr if is_corr_pose or label_next_pose == 'Done!' else red_clr

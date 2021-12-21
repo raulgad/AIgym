@@ -30,26 +30,17 @@ class poseDetector():
     def __init__(self, static_image_mode=False, model_complexity=0, smooth_landmarks=True, enable_segmentation=False, smooth_segmentation=True,
                  min_detection_confidence=0.5, min_tracking_confidence=0.5):
         
-        self.static_image_mode = static_image_mode
-        self.model_complexity = model_complexity
-        self.smooth_landmarks = smooth_landmarks
-        self.enable_segmentation = enable_segmentation
-        self.smooth_segmentation = smooth_segmentation
-        self.min_detection_confidence = min_detection_confidence
-        self.min_tracking_confidence = min_tracking_confidence
- 
-        self.mpDraw = mp.solutions.drawing_utils
         self.mpPose = mp.solutions.pose
-        self.pose = self.mpPose.Pose(self.static_image_mode, self.model_complexity, 
-                                    self.smooth_landmarks, self.enable_segmentation, 
-                                    self.smooth_segmentation, self.min_detection_confidence, 
-                                    self.min_tracking_confidence)
+        self.pose = self.mpPose.Pose(static_image_mode, model_complexity, 
+                                    smooth_landmarks, enable_segmentation, 
+                                    smooth_segmentation, min_detection_confidence, 
+                                    min_tracking_confidence)
         
         # Init poses dictionary from json file
         with open(os.path.join(dirname, 'poses.json'), 'r') as fp:
             self.poses = json.load(fp)
 
-            # Convert angle's tuple to type 'typle' (from string)
+            # Convert angle from string to tuple
             # TODO: Add END poses and others keys
             for _, pose in self.poses.items():
                 pose['start']['angles'] = {eval(k):v for k,v in pose['start']['angles'].items()}
@@ -90,34 +81,29 @@ class poseDetector():
         except:
             print('Something going wrong in correct_pose() -> PoseModule')
             return False
-        
-    def findPose(self, img, draw=True):
-        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        self.results = self.pose.process(imgRGB)
-        if self.results.pose_landmarks:
-            if draw:
-                self.mpDraw.draw_landmarks(img, self.results.pose_landmarks,
-                                           self.mpPose.POSE_CONNECTIONS)
-        return img, self.results
  
-    def findPosition(self, img):
-        self.lmList = []
+    def analyze(self, img):
+        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        results = self.pose.process(imgRGB)
+        lmks = []
         try:
-            if self.results.pose_landmarks:
-                for lm in self.results.pose_landmarks.landmark:
+            if results.pose_landmarks:
+                # Get coordinates of the landmarks according to the screen size
+                for lm in results.pose_landmarks.landmark:
                     h, w, _ = img.shape
                     cx, cy, cz = int(lm.x * w), int(lm.y * h), int(lm.z * w)
-                    self.lmList.append([cx, cy, cz])
+                    lmks.append([cx, cy, cz])
         except:
+            print('Something going wrong in analyze() -> PoseModule')
             pass
-        return self.lmList
+        return lmks, results.segmentation_mask
  
     def find_angle(self, ps, lmks):
         # Get the coordinates
         x1, y1, _ = lmks[ps[0]]
         x2, y2, _ = lmks[ps[1]]
         x3, y3, _ = lmks[ps[2]]
-        # Calculate the Angle
+        # Calculate the angle between three coordinates
         angle = abs(math.degrees(math.atan2(y3 - y2, x3 - x2) 
                                 - math.atan2(y1 - y2, x1 - x2)))
         return angle
