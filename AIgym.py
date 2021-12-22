@@ -105,10 +105,11 @@ some_bttn_active = False
 
 # Background video 
 bg_video_name = os.path.join(dirname, 'pose_1' + cons.format_video)
-capBackground = cv2.VideoCapture(bg_video_name)
-capBackground.set(cv2.CAP_PROP_FRAME_WIDTH, cons.window_height)
-capBackground.set(cv2.CAP_PROP_FRAME_HEIGHT, cons.window_width)
+cap_backgrd = cv2.VideoCapture(bg_video_name)
+cap_backgrd.set(cv2.CAP_PROP_FRAME_WIDTH, cons.window_height)
+cap_backgrd.set(cv2.CAP_PROP_FRAME_HEIGHT, cons.window_width)
 
+cap_backgrd_paused = False
 
 while cap.isOpened():
     _, img = cap.read()
@@ -134,10 +135,13 @@ while cap.isOpened():
             # Segmentation
             if enable_segmentation:
                 # Read background video frame
-                success, img_back = capBackground.read()
+                if cap_backgrd_paused:
+                    img_back = paused_img_back
+                else:
+                    success, img_back = cap_backgrd.read()
                 # Repeat video if it's end
                 if not success:
-                    capBackground.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                    cap_backgrd.set(cv2.CAP_PROP_POS_FRAMES, 0)
                 else:
                     # TODO: Use video with correct resolution
                     # Resize video frame to be equal window's size
@@ -338,7 +342,11 @@ while cap.isOpened():
                         wtimer_tapped = True
                         exit_butt_active = True
                         cont_butt_active = True
-                        
+
+                        # Pause video
+                        cap_backgrd_paused = True
+                        paused_img_back = img_back
+
                         cv2.rectangle(img, 
                                 (wtimer_pos_x, wtimer_pos_y), 
                                 (wtimer_pos_x + wtimer_width, wtimer_pos_y + wtimer_height), 
@@ -479,6 +487,7 @@ while cap.isOpened():
                             wtimer_tapped = False
                             wtimer_active = True
                             ptimer_active = True
+                            cap_backgrd_paused = False
 
                             cv2.rectangle(img, 
                                     (cont_butt_pos_x, cont_butt_pos_y), 

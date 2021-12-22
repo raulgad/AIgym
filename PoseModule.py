@@ -95,11 +95,11 @@ class poseDetector():
             pass
         return lmks, results.segmentation_mask
  
-    def find_angle(self, ps, lmks):
+    def find_angle(self, points, lmks):
         # Get the coordinates
-        x1, y1, _ = lmks[ps[0]]
-        x2, y2, _ = lmks[ps[1]]
-        x3, y3, _ = lmks[ps[2]]
+        x1, y1, _ = lmks[points[0]]
+        x2, y2, _ = lmks[points[1]]
+        x3, y3, _ = lmks[points[2]]
         # Calculate the angle between three coordinates
         angle = abs(math.degrees(math.atan2(y3 - y2, x3 - x2) 
                                 - math.atan2(y1 - y2, x1 - x2)))
