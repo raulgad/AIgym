@@ -3,8 +3,6 @@ import mediapipe as mp
 import math
 import json
 import os
-import time
-import numpy as np
 window_width = 960 #1024
 window_height = 540 #768
 
@@ -19,7 +17,7 @@ def draw_line(img, landmarks, points=[], clr=(255,255,255), point_clr=(255,255,2
         # Draw point
         x1, y1, _ = landmarks[point]
         draw_point(img, x1, y1, clr=point_clr)
-        # Draw line and next point
+        # Draw line to next point
         if p_idx + 1 < len(points):
             x2, y2, _ = landmarks[points[p_idx + 1]]
             cv2.line(img, (x1, y1), (x2, y2), clr, 3)
@@ -30,8 +28,7 @@ class poseDetector():
     def __init__(self, static_image_mode=False, model_complexity=0, smooth_landmarks=True, enable_segmentation=False, smooth_segmentation=True,
                  min_detection_confidence=0.5, min_tracking_confidence=0.5):
         
-        self.mpPose = mp.solutions.pose
-        self.pose = self.mpPose.Pose(static_image_mode, model_complexity, 
+        self.pose = mp.solutions.pose.Pose(static_image_mode, model_complexity, 
                                     smooth_landmarks, enable_segmentation, 
                                     smooth_segmentation, min_detection_confidence, 
                                     min_tracking_confidence)

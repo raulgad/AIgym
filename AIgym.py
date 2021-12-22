@@ -3,41 +3,34 @@ import numpy as np
 import time
 import PoseModule as pm
 import os
+import Constants as cons
 
 dirname = os.path.dirname(__file__)
 
-cap = cv2.VideoCapture(0)
-window_width = 960 #1024
-window_height = 540 #768
-cap.set(3,window_width)
-cap.set(4,window_height)
+cap = cv2.VideoCapture(cons.camera_id)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, cons.window_width)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cons.window_height)
+cv2.namedWindow(cons.name_app, cv2.WINDOW_NORMAL)
 
 enable_segmentation=True
 
 detector = pm.poseDetector(enable_segmentation=enable_segmentation)
-count = 0
-dir = 0
-pTime = 0
 
-black_clr = (0, 0, 0)
-white_clr = (255, 255, 255)
-green_clr = (0, 255, 0)
-red_clr = (0, 0, 255)
-blue_clr = (255, 0, 0)
+prev_time = 0
 
 # Init variables for first pose 
 trng_seq = list(detector.poses)
 #TODO: Get training duration from json
-trng_duration = 5 * 60 # mins, secs
+trng_duration = cons.duration_trng
 pose_name = trng_seq.pop(0)
 pose_duration = detector.poses[pose_name]['duration']
 pose_angles = detector.poses[pose_name]['start']['angles']
 
 is_corr_pose = False
-label_next_pose = 'T Pose'
+label_next_pose = pose_name.capitalize() + cons.lbl_pose
 
 wtimer_left = trng_duration
-wtimer_text_size = 2
+wtimer_text_size = cons.fnt_size_timer
 wtimer_curr_rec_width = 0
 winit_time = time.time()
 prev_wcurr_time = 0
@@ -110,68 +103,26 @@ workout_butt_pressed = False
 
 some_bttn_active = False
 
-# Indexes of all landmarks
-NOSE = detector.mpPose.PoseLandmark.NOSE.value
-LEFT_EYE_INNER = detector.mpPose.PoseLandmark.LEFT_EYE_INNER.value
-LEFT_EYE = detector.mpPose.PoseLandmark.LEFT_EYE.value
-LEFT_EYE_OUTER = detector.mpPose.PoseLandmark.LEFT_EYE_OUTER.value
-RIGHT_EYE_INNER = detector.mpPose.PoseLandmark.RIGHT_EYE_INNER.value
-RIGHT_EYE = detector.mpPose.PoseLandmark.RIGHT_EYE.value
-RIGHT_EYE_OUTER = detector.mpPose.PoseLandmark.RIGHT_EYE_OUTER.value
-LEFT_EAR = detector.mpPose.PoseLandmark.LEFT_EAR.value
-RIGHT_EAR = detector.mpPose.PoseLandmark.RIGHT_EAR.value
-MOUTH_LEFT = detector.mpPose.PoseLandmark.MOUTH_LEFT.value
-MOUTH_RIGHT = detector.mpPose.PoseLandmark.MOUTH_RIGHT.value
-LEFT_SHOULDER = detector.mpPose.PoseLandmark.LEFT_SHOULDER.value
-RIGHT_SHOULDER = detector.mpPose.PoseLandmark.RIGHT_SHOULDER.value
-LEFT_ELBOW = detector.mpPose.PoseLandmark.LEFT_ELBOW.value
-RIGHT_ELBOW = detector.mpPose.PoseLandmark.RIGHT_ELBOW.value
-LEFT_WRIST = detector.mpPose.PoseLandmark.LEFT_WRIST.value
-RIGHT_WRIST = detector.mpPose.PoseLandmark.RIGHT_WRIST.value
-LEFT_PINKY = detector.mpPose.PoseLandmark.LEFT_PINKY.value
-RIGHT_PINKY = detector.mpPose.PoseLandmark.RIGHT_PINKY.value
-LEFT_INDEX = detector.mpPose.PoseLandmark.LEFT_INDEX.value
-RIGHT_INDEX = detector.mpPose.PoseLandmark.RIGHT_INDEX.value
-LEFT_THUMB = detector.mpPose.PoseLandmark.LEFT_THUMB.value
-RIGHT_THUMB = detector.mpPose.PoseLandmark.RIGHT_THUMB.value
-LEFT_HIP = detector.mpPose.PoseLandmark.LEFT_HIP.value
-RIGHT_HIP = detector.mpPose.PoseLandmark.RIGHT_HIP.value
-LEFT_KNEE = detector.mpPose.PoseLandmark.LEFT_KNEE.value
-RIGHT_KNEE = detector.mpPose.PoseLandmark.RIGHT_KNEE.value
-LEFT_ANKLE = detector.mpPose.PoseLandmark.LEFT_ANKLE.value
-RIGHT_ANKLE = detector.mpPose.PoseLandmark.RIGHT_ANKLE.value
-LEFT_HEEL = detector.mpPose.PoseLandmark.LEFT_HEEL.value
-RIGHT_HEEL = detector.mpPose.PoseLandmark.RIGHT_HEEL.value
-LEFT_FOOT_INDEX = detector.mpPose.PoseLandmark.LEFT_FOOT_INDEX.value
-RIGHT_FOOT_INDEX = detector.mpPose.PoseLandmark.RIGHT_FOOT_INDEX.value
-
-# Indexes of landmarks for pose classification and correction
-main_lnms = [LEFT_SHOULDER, RIGHT_SHOULDER, LEFT_ELBOW, RIGHT_ELBOW,
-            LEFT_WRIST, RIGHT_WRIST, LEFT_HIP, RIGHT_HIP, LEFT_KNEE,
-            RIGHT_KNEE, LEFT_ANKLE, RIGHT_ANKLE]
-
-
 # Background video 
-bg_video_name = os.path.join(dirname, 'pose_1.mp4')
+bg_video_name = os.path.join(dirname, 'pose_1' + cons.format_video)
 capBackground = cv2.VideoCapture(bg_video_name)
-capBackground.set(3,window_height)
-capBackground.set(4,window_width)
+capBackground.set(cv2.CAP_PROP_FRAME_WIDTH, cons.window_height)
+capBackground.set(cv2.CAP_PROP_FRAME_HEIGHT, cons.window_width)
 
-cv2.namedWindow('AIgym', cv2.WINDOW_NORMAL)
 
 while cap.isOpened():
     _, img = cap.read()
 
     # Flip the frame horizontally for natural (selfie-view) visualization.
-    img = cv2.flip(img, 1)
+    img = cv2.flip(img, cons.flip_hor)
 
     lmks, segmentation_mask = detector.analyze(img)
 
-    if len(lmks) != 0:
+    if lmks:
         
         # Hands Menu Control
-        lhand_x, lhand_y, _ = lmks[RIGHT_INDEX]
-        rhand_x, rhand_y, _ = lmks[LEFT_INDEX]
+        lhand_x, lhand_y, _ = lmks[cons.RIGHT_INDEX]
+        rhand_x, rhand_y, _ = lmks[cons.LEFT_INDEX]
 
 
         # Youga
@@ -186,11 +137,11 @@ while cap.isOpened():
                 success, img_back = capBackground.read()
                 # Repeat video if it's end
                 if not success:
-                    capBackground.set(1, 0)
+                    capBackground.set(cv2.CAP_PROP_POS_FRAMES, 0)
                 else:
                     # TODO: Use video with correct resolution
                     # Resize video frame to be equal window's size
-                    img_back = cv2.resize(img_back,(window_width,window_height),fx=0,fy=0, interpolation = cv2.INTER_CUBIC)
+                    img_back = cv2.resize(img_back,(cons.window_width, cons.window_height),fx=0,fy=0, interpolation = cv2.INTER_CUBIC)
                     # Add background frame to segmented user's frame
                     condition = np.stack((segmentation_mask,) * 3, axis=-1) > 0.1
                     bg_image = np.zeros(img.shape, dtype=np.uint8)
@@ -202,10 +153,10 @@ while cap.isOpened():
             is_corr_pose = detector.correct_pose(img, lmks, pose_angles, draw=True)
 
             # Update the color (to green) with which the label will be written on the image.
-            label_clr = green_clr if is_corr_pose or label_next_pose == 'Done!' else red_clr
+            label_clr = cons.clr_green if is_corr_pose or label_next_pose == cons.lbl_done else cons.clr_red
 
-            # Write the label on the output image. 
-            cv2.putText(img, label_next_pose, (400, 75),cv2.FONT_HERSHEY_PLAIN, 2, label_clr, 2)
+            # Write the pose label on the output image. 
+            cv2.putText(img, label_next_pose, (400, 75), cv2.FONT_HERSHEY_DUPLEX, cons.fnt_size_menu, label_clr, cons.fnt_thick)
             
 
 
@@ -230,8 +181,8 @@ while cap.isOpened():
                         wmins, wsecs = divmod(wtimer_left, 60)
                         wtimer = '{:02d}:{:02d}'.format(wmins, wsecs)
                 else:
-                    wtimer= 'Time is end!'
-                    wtimer_text_size = 1
+                    wtimer= cons.lbl_time_end
+                    wtimer_text_size -= 1
                     winit_time = time.time()
             else:
                 winit_time = time.time()
@@ -241,37 +192,37 @@ while cap.isOpened():
                 cv2.rectangle(img, 
                             (wtimer_pos_x, wtimer_pos_y), 
                             (wtimer_pos_x + wtimer_width, wtimer_pos_y + wtimer_height), 
-                            black_clr, 
-                            3)
+                            cons.clr_black, 
+                            cons.fnt_thick)
 
                 if wtimer_left > 0:
                     cv2.rectangle(img, 
                                 (wtimer_pos_x, wtimer_pos_y), 
                                 (wtimer_pos_x + wtimer_curr_rec_width, wtimer_pos_y + wtimer_height), 
-                                black_clr, 
+                                cons.clr_black, 
                                 cv2.FILLED)
                 else:
                     cv2.rectangle(img, 
                                 (wtimer_pos_x, wtimer_pos_y), 
                                 (wtimer_pos_x + wtimer_width, wtimer_pos_y + wtimer_height), 
-                                black_clr, 
+                                cons.clr_black, 
                                 cv2.FILLED)
                 
                 #Workout timer text
                 cv2.putText(img, 
-                            'Pause', 
+                            cons.lbl_pause, 
                             (wtimer_pos_x + 5, wtimer_pos_y + 65), 
                             cv2.FONT_HERSHEY_DUPLEX, 
-                            1, 
-                            white_clr, 
-                            2)
+                            cons.fnt_size_menu, 
+                            cons.clr_white, 
+                            cons.fnt_thick)
                 cv2.putText(img, 
                             wtimer, 
                             (wtimer_pos_x + 115, wtimer_pos_y + 65), 
                             cv2.FONT_HERSHEY_DUPLEX, 
                             wtimer_text_size, 
-                            white_clr, 
-                            2)
+                            cons.clr_white, 
+                            cons.fnt_thick)
 
             
             #Pose timer
@@ -280,7 +231,7 @@ while cap.isOpened():
             ptimer_height = 100
             ptimer_pos_x = 650  # window_width - ptimer_width - 10
             ptimer_width_step = ptimer_width / pose_duration
-            ptimer_text = 'Next'
+            ptimer_text = cons.lbl_next
             
             # Change pose timer button if it's active
             if ptimer_active:
@@ -311,7 +262,7 @@ while cap.isOpened():
                         
                         # Check if user is done training
                         if not trng_seq:
-                            label_next_pose = 'Done!'
+                            label_next_pose = cons.lbl_done
                             ptimer_active = False
 
                         # Reset pose variables to next pose
@@ -321,7 +272,7 @@ while cap.isOpened():
                             # Set next pose
                             pose_name = trng_seq.pop(0)
                             # Set new values to pose variables 
-                            label_next_pose = pose_name.capitalize() + ' Pose'
+                            label_next_pose = pose_name.capitalize() + cons.lbl_pose
                             pose_duration = detector.poses[pose_name]['duration']
                             pose_angles = detector.poses[pose_name]['start']['angles']
                             
@@ -334,20 +285,20 @@ while cap.isOpened():
                 cv2.rectangle(img, 
                             (ptimer_pos_x, ptimer_pos_y), 
                             (ptimer_pos_x + ptimer_width, ptimer_pos_y + ptimer_height), 
-                            black_clr, 
-                            3)
+                            cons.clr_black, 
+                            cons.fnt_thick)
 
                 if ptimer_left > 0:
                     cv2.rectangle(img, 
                                 (ptimer_pos_x, ptimer_pos_y), 
                                 (ptimer_pos_x + ptimer_curr_rec_width, ptimer_pos_y + ptimer_height), 
-                                black_clr, 
+                                cons.clr_black, 
                                 cv2.FILLED)
                 else:
                     cv2.rectangle(img, 
                                 (ptimer_pos_x, ptimer_pos_y), 
                                 (ptimer_pos_x + ptimer_width, ptimer_pos_y + ptimer_height), 
-                                black_clr, 
+                                cons.clr_black, 
                                 cv2.FILLED)
                 
                 #Workout timer text
@@ -355,9 +306,9 @@ while cap.isOpened():
                             ptimer_text, 
                             (ptimer_pos_x + 100, ptimer_pos_y + 65), 
                             cv2.FONT_HERSHEY_DUPLEX, 
-                            1, 
-                            white_clr, 
-                            2)
+                            cons.fnt_size_menu, 
+                            cons.clr_white, 
+                            cons.fnt_thick)
             
             
             # Wtimer
@@ -375,12 +326,12 @@ while cap.isOpened():
                     cv2.rectangle(img, 
                                 (wtimer_pos_x, wtimer_pos_y), 
                                 (wtimer_pos_x + wtimer_width, wtimer_pos_y + wtimer_height), 
-                                green_clr, 
-                                3)
+                                cons.clr_green, 
+                                cons.fnt_thick)
                                 
                     # Detect 'tap' on wtimer
                     hand_in_wtimer_curr_time = int(time.time() - hand_in_wtimer_inittime)
-                    if hand_in_wtimer_curr_time >= 1 and not wtimer_pressed:
+                    if hand_in_wtimer_curr_time >= cons.time_tap and not wtimer_pressed:
                         # Turn off other buttons
                         some_bttn_active = True
 
@@ -391,7 +342,7 @@ while cap.isOpened():
                         cv2.rectangle(img, 
                                 (wtimer_pos_x, wtimer_pos_y), 
                                 (wtimer_pos_x + wtimer_width, wtimer_pos_y + wtimer_height), 
-                                green_clr, 
+                                cons.clr_green, 
                                 cv2.FILLED)
 
                         wtimer_pressed = True
@@ -412,7 +363,7 @@ while cap.isOpened():
                 if exit_butt_active:
                     
                     # Draw exit button
-                    exit_butt_pos_x = int(window_width / 5.5)
+                    exit_butt_pos_x = int(cons.window_width / 5.5)
                     exit_butt_pos_y = 200
                     exit_butt_width = 300
                     exit_butt_height = 100
@@ -420,22 +371,22 @@ while cap.isOpened():
                     cv2.rectangle(img, 
                                 (exit_butt_pos_x, exit_butt_pos_y), 
                                 (exit_butt_pos_x + exit_butt_width, exit_butt_pos_y + exit_butt_height), 
-                                black_clr, 
-                                3)
+                                cons.clr_black, 
+                                cons.fnt_thick)
                     cv2.rectangle(img, 
                                 (exit_butt_pos_x, exit_butt_pos_y), 
                                 (exit_butt_pos_x + exit_butt_width, exit_butt_pos_y + exit_butt_height), 
-                                black_clr, 
+                                cons.clr_black, 
                                 cv2.FILLED)
                     
                     # Exit button text
                     cv2.putText(img, 
-                                'Exit', 
+                                cons.lbl_exit, 
                                 (exit_butt_pos_x + 100, exit_butt_pos_y + 65), 
                                 cv2.FONT_HERSHEY_DUPLEX, 
-                                1, 
-                                white_clr, 
-                                2)
+                                cons.fnt_size_menu, 
+                                cons.clr_white, 
+                                cons.fnt_thick)
 
                     lhand_x_in_exit_butt_x = lhand_x > exit_butt_pos_x and lhand_x < (exit_butt_pos_x + exit_butt_width)
                     lhand_y_in_exit_butt_y = lhand_y > exit_butt_pos_y and lhand_y < (exit_butt_pos_y + exit_butt_height)
@@ -449,19 +400,19 @@ while cap.isOpened():
                         cv2.rectangle(img, 
                                     (exit_butt_pos_x, exit_butt_pos_y), 
                                     (exit_butt_pos_x + exit_butt_width, exit_butt_pos_y + exit_butt_height), 
-                                    green_clr, 
-                                    3)
+                                    cons.clr_green, 
+                                    cons.fnt_thick)
                         
                         # Detect 'tap' on exit_butt
                         hand_in_exit_butt_curr_time = int(time.time() - hand_in_exit_butt_inittime)
-                        if hand_in_exit_butt_curr_time >= 1 and not exit_butt_pressed:
+                        if hand_in_exit_butt_curr_time >= cons.time_tap and not exit_butt_pressed:
                              # Turn off other buttons
                             some_bttn_active = True
 
                             cv2.rectangle(img, 
                                     (exit_butt_pos_x, exit_butt_pos_y), 
                                     (exit_butt_pos_x + exit_butt_width, exit_butt_pos_y + exit_butt_height), 
-                                    green_clr, 
+                                    cons.clr_green, 
                                     cv2.FILLED)
                             
                             exit_butt_active = False
@@ -491,17 +442,17 @@ while cap.isOpened():
                     cv2.rectangle(img, 
                                 (cont_butt_pos_x, cont_butt_pos_y), 
                                 (cont_butt_pos_x + cont_butt_width, cont_butt_pos_y + cont_butt_height), 
-                                black_clr, 
-                                3)
+                                cons.clr_black, 
+                                cons.fnt_thick)
                     cv2.rectangle(img, 
                                 (cont_butt_pos_x, cont_butt_pos_y), 
                                 (cont_butt_pos_x + cont_butt_width, cont_butt_pos_y + cont_butt_height), 
-                                black_clr, 
+                                cons.clr_black, 
                                 cv2.FILLED)
                     
                     # Exit button text
-                    cv2.putText(img, 'Continue', (cont_butt_pos_x + 80, cont_butt_pos_y + 65), cv2.FONT_HERSHEY_DUPLEX, 1, 
-                                white_clr, 2)
+                    cv2.putText(img, cons.lbl_continue, (cont_butt_pos_x + 80, cont_butt_pos_y + 65), cv2.FONT_HERSHEY_DUPLEX, cons.fnt_size_menu, 
+                                cons.clr_white, cons.fnt_thick)
 
                     lhand_x_in_cont_butt_x = lhand_x > cont_butt_pos_x and lhand_x < (cont_butt_pos_x + cont_butt_width)
                     lhand_y_in_cont_butt_y = lhand_y > cont_butt_pos_y and lhand_y < (cont_butt_pos_y + cont_butt_height)
@@ -515,12 +466,12 @@ while cap.isOpened():
                         cv2.rectangle(img, 
                                     (cont_butt_pos_x, cont_butt_pos_y), 
                                     (cont_butt_pos_x + cont_butt_width, cont_butt_pos_y + cont_butt_height), 
-                                    green_clr, 
-                                    3)
+                                    cons.clr_green, 
+                                    cons.fnt_thick)
 
                         # Detect 'tap' on cont_butt
                         hand_in_cont_butt_curr_time = int(time.time() - hand_in_cont_butt_inittime)
-                        if hand_in_cont_butt_curr_time >= 1 and not cont_butt_pressed:
+                        if hand_in_cont_butt_curr_time >= cons.time_tap and not cont_butt_pressed:
                             # Turn off other buttons
                             some_bttn_active = True
 
@@ -532,7 +483,7 @@ while cap.isOpened():
                             cv2.rectangle(img, 
                                     (cont_butt_pos_x, cont_butt_pos_y), 
                                     (cont_butt_pos_x + cont_butt_width, cont_butt_pos_y + cont_butt_height), 
-                                    green_clr, 
+                                    cons.clr_green, 
                                     cv2.FILLED)
 
                             cont_butt_pressed = True
@@ -558,12 +509,12 @@ while cap.isOpened():
                     cv2.rectangle(img, 
                                 (ptimer_pos_x, ptimer_pos_y), 
                                 (ptimer_pos_x + ptimer_width, ptimer_pos_y + ptimer_height), 
-                                green_clr, 
-                                3)
+                                cons.clr_green, 
+                                cons.fnt_thick)
 
                     # Detect 'tap' on ptimer
                     hand_in_ptimer_curr_time = int(time.time() - hand_in_ptimer_inittime)
-                    if hand_in_ptimer_curr_time >= 1 and not ptimer_pressed:
+                    if hand_in_ptimer_curr_time >= cons.time_tap and not ptimer_pressed:
                         # Turn off other buttons
                         some_bttn_active = True
 
@@ -573,7 +524,7 @@ while cap.isOpened():
                         #TODO: DRY
                         # Check if user is done training
                         if not trng_seq:
-                            label_next_pose = 'Done!'
+                            label_next_pose = cons.lbl_done
                             ptimer_active = False
 
                             some_bttn_active = False
@@ -584,7 +535,7 @@ while cap.isOpened():
                             # Set next pose
                             pose_name = trng_seq.pop(0)
                             # Set new values to pose variables 
-                            label_next_pose = pose_name.capitalize() + ' Pose'
+                            label_next_pose = pose_name.capitalize() + cons.lbl_pose
                             pose_duration = detector.poses[pose_name]['duration']
                             pose_angles = detector.poses[pose_name]['start']['angles']
 
@@ -592,7 +543,7 @@ while cap.isOpened():
                         cv2.rectangle(img, 
                                 (ptimer_pos_x, ptimer_pos_y), 
                                 (ptimer_pos_x + ptimer_width, ptimer_pos_y + ptimer_height), 
-                                green_clr, 
+                                cons.clr_green, 
                                 cv2.FILLED)
 
                         ptimer_pressed = True
@@ -615,22 +566,22 @@ while cap.isOpened():
             cv2.rectangle(img, 
                         (yoga_butt_pos_x, yoga_butt_pos_y), 
                         (yoga_butt_pos_x + yoga_butt_width, yoga_butt_pos_y + yoga_butt_height), 
-                        black_clr, 
-                        3)
+                        cons.clr_black, 
+                        cons.fnt_thick)
             cv2.rectangle(img, 
                         (yoga_butt_pos_x, yoga_butt_pos_y), 
                         (yoga_butt_pos_x + yoga_butt_width, yoga_butt_pos_y + yoga_butt_height), 
-                        black_clr, 
+                        cons.clr_black, 
                         cv2.FILLED)
             
             # yoga button text
             cv2.putText(img, 
-                        'Yoga', 
+                        cons.lbl_yoga, 
                         (yoga_butt_pos_x + 100, yoga_butt_pos_y + 65), 
                         cv2.FONT_HERSHEY_DUPLEX, 
-                        1, 
-                        white_clr, 
-                        2)
+                        cons.fnt_size_menu, 
+                        cons.clr_white, 
+                        cons.fnt_thick)
 
             # Tap yoga button
             if yoga_butt_active:
@@ -646,31 +597,31 @@ while cap.isOpened():
                     cv2.rectangle(img, 
                                 (yoga_butt_pos_x, yoga_butt_pos_y), 
                                 (yoga_butt_pos_x + yoga_butt_width, yoga_butt_pos_y + yoga_butt_height), 
-                                green_clr, 
-                                3)
+                                cons.clr_green, 
+                                cons.fnt_thick)
 
                     # Detect 'tap' on yoga_butt
                     hand_in_yoga_butt_curr_time = int(time.time() - hand_in_yoga_butt_inittime)
-                    if hand_in_yoga_butt_curr_time >= 1 and not yoga_butt_pressed:
+                    if hand_in_yoga_butt_curr_time >= cons.time_tap and not yoga_butt_pressed:
                         # Turn off other buttons
                         some_bttn_active = True
 
                         # Reset to yoga
-                        hand_in_wtimer_inittime = 1000000000000
-                        hand_in_ptimer_inittime = 1000000000000
+                        hand_in_wtimer_inittime = cons.num_big
+                        hand_in_ptimer_inittime = cons.num_big
 
                         # Init variables for first pose 
                         trng_seq = list(detector.poses)
                         #TODO: Get training duration from json
-                        trng_duration = 5 * 60 # mins, secs
+                        trng_duration = cons.duration_trng
                         pose_name = trng_seq.pop(0)
                         pose_duration = detector.poses[pose_name]['duration']
                         pose_angles = detector.poses[pose_name]['start']['angles']
 
-                        label_next_pose = 'T Pose'
+                        label_next_pose = pose_name.capitalize() + cons.lbl_pose
 
                         wtimer_left = trng_duration
-                        wtimer_text_size = 2
+                        wtimer_text_size = cons.fnt_size_timer
                         wtimer_curr_rec_width = 0
                         winit_time = time.time()
                         prev_wcurr_time = 0
@@ -704,7 +655,7 @@ while cap.isOpened():
                         cv2.rectangle(img, 
                                 (yoga_butt_pos_x, yoga_butt_pos_y), 
                                 (yoga_butt_pos_x + yoga_butt_width, yoga_butt_pos_y + yoga_butt_height), 
-                                green_clr, 
+                                cons.clr_green, 
                                 cv2.FILLED)
 
                 else:
@@ -715,7 +666,7 @@ while cap.isOpened():
 
         if workout_butt_active:
             # Draw workout button
-            workout_butt_pos_x = 650 #yoga_butt_pos_x + yoga_butt_width + 40
+            workout_butt_pos_x = 650 # yoga_butt_pos_x + yoga_butt_width + 40
             workout_butt_pos_y = 10
             workout_butt_width = 300
             workout_butt_height = 100
@@ -723,22 +674,22 @@ while cap.isOpened():
             cv2.rectangle(img, 
                         (workout_butt_pos_x, workout_butt_pos_y), 
                         (workout_butt_pos_x + workout_butt_width, workout_butt_pos_y + workout_butt_height), 
-                        black_clr, 
-                        3)
+                        cons.clr_black, 
+                        cons.fnt_thick)
             cv2.rectangle(img, 
                         (workout_butt_pos_x, workout_butt_pos_y), 
                         (workout_butt_pos_x + workout_butt_width, workout_butt_pos_y + workout_butt_height), 
-                        black_clr, 
+                        cons.clr_black, 
                         cv2.FILLED)
             
             # workout button text
             cv2.putText(img, 
-                        'Workout', 
+                        cons.lbl_workout,
                         (workout_butt_pos_x + 100, workout_butt_pos_y + 65), 
                         cv2.FONT_HERSHEY_DUPLEX, 
-                        1, 
-                        white_clr, 
-                        2)
+                        cons.fnt_size_menu, 
+                        cons.clr_white, 
+                        cons.fnt_thick)
 
             # Tap workout button
             if workout_butt_active:
@@ -754,31 +705,31 @@ while cap.isOpened():
                     cv2.rectangle(img, 
                                 (workout_butt_pos_x, workout_butt_pos_y), 
                                 (workout_butt_pos_x + workout_butt_width, workout_butt_pos_y + workout_butt_height), 
-                                green_clr, 
-                                3)
+                                cons.clr_green, 
+                                cons.fnt_thick)
 
                     # Detect 'tap' on workout_butt
                     hand_in_workout_butt_curr_time = int(time.time() - hand_in_workout_butt_inittime)
-                    if hand_in_workout_butt_curr_time >= 1 and not workout_butt_pressed:
+                    if hand_in_workout_butt_curr_time >= cons.time_tap and not workout_butt_pressed:
                         # Turn off other buttons
                         some_bttn_active = True
                         
                         # Reset to yoga
-                        hand_in_wtimer_inittime = 1000000000000
-                        hand_in_ptimer_inittime = 1000000000000
+                        hand_in_wtimer_inittime = cons.num_big
+                        hand_in_ptimer_inittime = cons.num_big
 
                         # Init variables for first pose 
                         trng_seq = list(detector.poses)
                         #TODO: Get training duration from json
-                        trng_duration = 5 * 60 # mins, secs
+                        trng_duration = cons.duration_trng
                         pose_name = trng_seq.pop(0)
                         pose_duration = detector.poses[pose_name]['duration']
                         pose_angles = detector.poses[pose_name]['start']['angles']
 
-                        label_next_pose = 'T Pose'
+                        label_next_pose = pose_name.capitalize() + cons.lbl_pose
 
                         wtimer_left = trng_duration
-                        wtimer_text_size = 2
+                        wtimer_text_size = cons.fnt_size_timer
                         wtimer_curr_rec_width = 0
                         winit_time = time.time()
                         prev_wcurr_time = 0
@@ -810,7 +761,7 @@ while cap.isOpened():
                         cv2.rectangle(img, 
                                 (workout_butt_pos_x, workout_butt_pos_y), 
                                 (workout_butt_pos_x + workout_butt_width, workout_butt_pos_y + workout_butt_height), 
-                                green_clr, 
+                                cons.clr_green, 
                                 cv2.FILLED)
 
                         workout_butt_pressed = True
@@ -823,15 +774,15 @@ while cap.isOpened():
     
 
     # Draw framerate
-    cTime = time.time()
-    fps = 1 / (cTime - pTime)
-    pTime = cTime
-    cv2.putText(img, str(int(fps)), (50, 500), cv2.FONT_HERSHEY_PLAIN, 5, blue_clr, 5)
+    curr_time = time.time()
+    fps = 1 / (curr_time - prev_time)
+    prev_time = curr_time
+    cv2.putText(img, str(int(fps)), (50, 500), cv2.FONT_HERSHEY_DUPLEX, cons.fnt_size_menu, cons.clr_blue, cons.fnt_thick)
 
 
-    cv2.imshow("AIgym", img)
+    cv2.imshow(cons.name_app, img)
 
-    if cv2.waitKey(10) & 0xFF == ord('q'):
+    if cv2.waitKey(cons.time_wait_close_window) & 0xFF == ord(cons.kbrd_quit):
         break
 
 cap.release()
