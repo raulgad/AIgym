@@ -35,7 +35,7 @@ wtimer_curr_rec_width = 0
 winit_time = time.time()
 prev_wcurr_time = 0
 wmins, wsecs = divmod(wtimer_left, 60)
-wtimer = '{:02d}:{:02d}'.format(wmins, wsecs)
+wtimer_lbl = '{:02d}:{:02d}'.format(wmins, wsecs)
 
 ptimer_left = pose_duration
 ptimer_curr_rec_width = 0
@@ -110,6 +110,7 @@ cap_backgrd.set(cv2.CAP_PROP_FRAME_WIDTH, cons.window_height)
 cap_backgrd.set(cv2.CAP_PROP_FRAME_HEIGHT, cons.window_width)
 
 cap_backgrd_paused = False
+paused_img_back = []
 
 while cap.isOpened():
     _, img = cap.read()
@@ -135,10 +136,9 @@ while cap.isOpened():
             # Segmentation
             if enable_segmentation:
                 # Read background video frame
-                if cap_backgrd_paused:
-                    img_back = paused_img_back
-                else:
-                    success, img_back = cap_backgrd.read()
+                success, img_back = cap_backgrd.read()
+                # Set paused background image if user tap on Pause button
+                if cap_backgrd_paused: img_back = paused_img_back
                 # Repeat video if it's end
                 if not success:
                     cap_backgrd.set(cv2.CAP_PROP_POS_FRAMES, 0)
@@ -172,6 +172,7 @@ while cap.isOpened():
             wtimer_height = 100
             wtimer_width_step = wtimer_width / trng_duration
 
+            # Change training time button if it active
             if wtimer_active:
                 
                 if wtimer_left > 0:
@@ -183,9 +184,9 @@ while cap.isOpened():
                         wtimer_left -= 1
 
                         wmins, wsecs = divmod(wtimer_left, 60)
-                        wtimer = '{:02d}:{:02d}'.format(wmins, wsecs)
+                        wtimer_lbl = '{:02d}:{:02d}'.format(wmins, wsecs)
                 else:
-                    wtimer= cons.lbl_time_end
+                    wtimer_lbl= cons.lbl_time_end
                     wtimer_text_size -= 1
                     winit_time = time.time()
             else:
@@ -198,6 +199,11 @@ while cap.isOpened():
                             (wtimer_pos_x + wtimer_width, wtimer_pos_y + wtimer_height), 
                             cons.clr_black, 
                             cons.fnt_thick)
+                cv2.rectangle(img, 
+                            (wtimer_pos_x, wtimer_pos_y), 
+                            (wtimer_pos_x + wtimer_width, wtimer_pos_y + wtimer_height), 
+                            cons.clr_gray, 
+                            cv2.FILLED)
 
                 if wtimer_left > 0:
                     cv2.rectangle(img, 
@@ -221,7 +227,7 @@ while cap.isOpened():
                             cons.clr_white, 
                             cons.fnt_thick)
                 cv2.putText(img, 
-                            wtimer, 
+                            wtimer_lbl, 
                             (wtimer_pos_x + 115, wtimer_pos_y + 65), 
                             cv2.FONT_HERSHEY_DUPLEX, 
                             wtimer_text_size, 
@@ -235,9 +241,8 @@ while cap.isOpened():
             ptimer_height = 100
             ptimer_pos_x = 650  # window_width - ptimer_width - 10
             ptimer_width_step = ptimer_width / pose_duration
-            ptimer_text = cons.lbl_next
             
-            # Change pose timer button if it's active
+            # Change pose timer button if it active
             if ptimer_active:
                 # Change anything only if we detect any pose
                 if is_corr_pose:
@@ -287,11 +292,16 @@ while cap.isOpened():
 
             if ptimer_show:
                 cv2.rectangle(img, 
-                            (ptimer_pos_x, ptimer_pos_y), 
-                            (ptimer_pos_x + ptimer_width, ptimer_pos_y + ptimer_height), 
-                            cons.clr_black, 
-                            cons.fnt_thick)
-
+                                (ptimer_pos_x, ptimer_pos_y), 
+                                (ptimer_pos_x + ptimer_width, ptimer_pos_y + ptimer_height), 
+                                cons.clr_black, 
+                                cons.fnt_thick)
+                cv2.rectangle(img, 
+                                (ptimer_pos_x, ptimer_pos_y), 
+                                (ptimer_pos_x + ptimer_width, ptimer_pos_y + ptimer_height), 
+                                cons.clr_gray, 
+                                cv2.FILLED)
+                
                 if ptimer_left > 0:
                     cv2.rectangle(img, 
                                 (ptimer_pos_x, ptimer_pos_y), 
@@ -304,10 +314,10 @@ while cap.isOpened():
                                 (ptimer_pos_x + ptimer_width, ptimer_pos_y + ptimer_height), 
                                 cons.clr_black, 
                                 cv2.FILLED)
-                
-                #Workout timer text
+               
+                # Pose timer text
                 cv2.putText(img, 
-                            ptimer_text, 
+                            cons.lbl_next, 
                             (ptimer_pos_x + 100, ptimer_pos_y + 65), 
                             cv2.FONT_HERSHEY_DUPLEX, 
                             cons.fnt_size_menu, 
@@ -380,11 +390,6 @@ while cap.isOpened():
                                 (exit_butt_pos_x, exit_butt_pos_y), 
                                 (exit_butt_pos_x + exit_butt_width, exit_butt_pos_y + exit_butt_height), 
                                 cons.clr_black, 
-                                cons.fnt_thick)
-                    cv2.rectangle(img, 
-                                (exit_butt_pos_x, exit_butt_pos_y), 
-                                (exit_butt_pos_x + exit_butt_width, exit_butt_pos_y + exit_butt_height), 
-                                cons.clr_black, 
                                 cv2.FILLED)
                     
                     # Exit button text
@@ -447,11 +452,6 @@ while cap.isOpened():
                     cont_butt_width = 300
                     cont_butt_height = 100
 
-                    cv2.rectangle(img, 
-                                (cont_butt_pos_x, cont_butt_pos_y), 
-                                (cont_butt_pos_x + cont_butt_width, cont_butt_pos_y + cont_butt_height), 
-                                cons.clr_black, 
-                                cons.fnt_thick)
                     cv2.rectangle(img, 
                                 (cont_butt_pos_x, cont_butt_pos_y), 
                                 (cont_butt_pos_x + cont_butt_width, cont_butt_pos_y + cont_butt_height), 
@@ -572,11 +572,7 @@ while cap.isOpened():
             yoga_butt_width = 300
             yoga_butt_height = 100
 
-            cv2.rectangle(img, 
-                        (yoga_butt_pos_x, yoga_butt_pos_y), 
-                        (yoga_butt_pos_x + yoga_butt_width, yoga_butt_pos_y + yoga_butt_height), 
-                        cons.clr_black, 
-                        cons.fnt_thick)
+        
             cv2.rectangle(img, 
                         (yoga_butt_pos_x, yoga_butt_pos_y), 
                         (yoga_butt_pos_x + yoga_butt_width, yoga_butt_pos_y + yoga_butt_height), 
@@ -635,7 +631,7 @@ while cap.isOpened():
                         winit_time = time.time()
                         prev_wcurr_time = 0
                         wmins, wsecs = divmod(wtimer_left, 60)
-                        wtimer = '{:02d}:{:02d}'.format(wmins, wsecs)
+                        wtimer_lbl = '{:02d}:{:02d}'.format(wmins, wsecs)
 
                         ptimer_left = pose_duration
                         ptimer_curr_rec_width = 0
@@ -680,11 +676,6 @@ while cap.isOpened():
             workout_butt_width = 300
             workout_butt_height = 100
 
-            cv2.rectangle(img, 
-                        (workout_butt_pos_x, workout_butt_pos_y), 
-                        (workout_butt_pos_x + workout_butt_width, workout_butt_pos_y + workout_butt_height), 
-                        cons.clr_black, 
-                        cons.fnt_thick)
             cv2.rectangle(img, 
                         (workout_butt_pos_x, workout_butt_pos_y), 
                         (workout_butt_pos_x + workout_butt_width, workout_butt_pos_y + workout_butt_height), 
@@ -743,7 +734,7 @@ while cap.isOpened():
                         winit_time = time.time()
                         prev_wcurr_time = 0
                         wmins, wsecs = divmod(wtimer_left, 60)
-                        wtimer = '{:02d}:{:02d}'.format(wmins, wsecs)
+                        wtimer_lbl = '{:02d}:{:02d}'.format(wmins, wsecs)
 
                         ptimer_left = pose_duration
                         ptimer_curr_rec_width = 0

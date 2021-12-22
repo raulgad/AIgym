@@ -23,6 +23,7 @@ clr_white = (255, 255, 255)
 clr_red = (0, 0, 255)
 clr_green = (0, 255, 0)
 clr_blue = (255, 0, 0)
+clr_gray = (192,192,192)
 
 # Training
 duration_trng = 5 * 60 # mins, secs
