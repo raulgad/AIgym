@@ -6,6 +6,9 @@ name_app = 'AIgym'
 # Formats
 format_video = '.mp4'
 
+# Files
+f_poses = 'poses.json'
+
 # Video
 camera_id = 0
 window_width = 960
@@ -82,10 +85,17 @@ fnt_thick = 2
 
 # Time
 time_wait_close_window = 10 # milliseconds
-time_tap = 1
+time_tap = 1 # seconds
 
 # Keyboard
 kbrd_quit = 'q'
 
 # Global
 num_big = 1000000000000
+
+# View
+view_circle_rad = 10
+view_circle_filled_rad = 5
+
+# Agnles
+ang_pose_detect_gap = 20.0

@@ -3,30 +3,30 @@ import mediapipe as mp
 import math
 import json
 import os
-window_width = 960 #1024
-window_height = 540 #768
+import Constants as cons
 
 dirname = os.path.dirname(__file__)
 
-def draw_point(img, x, y, clr=(0,0,255)):
-    cv2.circle(img, (x, y), 5, clr, cv2.FILLED)
-    cv2.circle(img, (x, y), 10, clr, 2)
+def draw_point(img, x, y, clr=cons.clr_red):
+    cv2.circle(img, (x, y), cons.view_circle_filled_rad, clr, cv2.FILLED)
+    cv2.circle(img, (x, y), cons.view_circle_rad, clr)
 
-def draw_line(img, landmarks, points=[], clr=(255,255,255), point_clr=(255,255,255)):
+def draw_line(img, lmks, points=[], clr=cons.clr_white, point_clr=cons.clr_white):
     for p_idx, point in enumerate(points):
         # Draw point
-        x1, y1, _ = landmarks[point]
+        x1, y1, _ = lmks[point]
         draw_point(img, x1, y1, clr=point_clr)
         # Draw line to next point
         if p_idx + 1 < len(points):
-            x2, y2, _ = landmarks[points[p_idx + 1]]
-            cv2.line(img, (x1, y1), (x2, y2), clr, 3)
+            x2, y2, _ = lmks[points[p_idx + 1]]
+            cv2.line(img, (x1, y1), (x2, y2), clr, cons.fnt_thick)
             draw_point(img, x2, y2, clr=point_clr)
 
 class poseDetector():
  
-    def __init__(self, static_image_mode=False, model_complexity=0, smooth_landmarks=True, enable_segmentation=False, smooth_segmentation=True,
-                 min_detection_confidence=0.5, min_tracking_confidence=0.5):
+    def __init__(self, static_image_mode=False, model_complexity=0, smooth_landmarks=True, 
+                enable_segmentation=False, smooth_segmentation=True,
+                min_detection_confidence=0.5, min_tracking_confidence=0.5):
         
         self.pose = mp.solutions.pose.Pose(static_image_mode, model_complexity, 
                                     smooth_landmarks, enable_segmentation, 
@@ -34,7 +34,7 @@ class poseDetector():
                                     min_tracking_confidence)
         
         # Init poses dictionary from json file
-        with open(os.path.join(dirname, 'poses.json'), 'r') as fp:
+        with open(os.path.join(dirname, cons.f_poses), 'r') as fp:
             self.poses = json.load(fp)
 
             # Convert angle from string to tuple
@@ -42,7 +42,7 @@ class poseDetector():
             for _, pose in self.poses.items():
                 pose['start']['angles'] = {eval(k):v for k,v in pose['start']['angles'].items()}
 
-    def correct_pose(self, img, curr_lmks, angles, angle_gap = 20.0, draw=False):
+    def correct_pose(self, img, curr_lmks, angles, angle_gap = cons.ang_pose_detect_gap, draw=False):
         # Init variable of user's current correct angles
         curr_corr_count = 0
         # Init dictionary of user's current not correct angles
@@ -71,12 +71,12 @@ class poseDetector():
                                     points=[ang_draw_ids[0], 
                                             ang_draw_ids[1], 
                                             ang_draw_ids[2]], 
-                                    clr=(0,0,255))
+                                    clr=cons.clr_red)
             # Return true if all user angles is correct
             return curr_corr_count == len(angles)
 
         except:
-            print('Something going wrong in correct_pose() -> PoseModule')
+            print('Something goes wrong in correct_pose() -> PoseModule')
             return False
  
     def analyze(self, img):
@@ -87,11 +87,11 @@ class poseDetector():
             if results.pose_landmarks:
                 # Get coordinates of the landmarks according to the screen size
                 for lm in results.pose_landmarks.landmark:
-                    h, w, _ = img.shape
-                    cx, cy, cz = int(lm.x * w), int(lm.y * h), int(lm.z * w)
+                    height, width, _ = img.shape
+                    cx, cy, cz = int(lm.x * width), int(lm.y * height), int(lm.z * width)
                     lmks.append([cx, cy, cz])
         except:
-            print('Something going wrong in analyze() -> PoseModule')
+            print('Something goes wrong in analyze() -> PoseModule')
             pass
         return lmks, results.segmentation_mask
  
