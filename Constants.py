@@ -78,6 +78,7 @@ lbl_exit = 'Exit'
 lbl_continue = 'Continue'
 lbl_yoga = 'Yoga'
 lbl_workout = 'Workout'
+lbl_correct_limbs = 'Correct red limbs'
 
 # Font Sizes
 fnt_size_timer = 2
