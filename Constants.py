@@ -26,6 +26,7 @@ clr_blue = (255, 0, 0)
 clr_gray = (192,192,192)
 
 # Training
+#TODO: Get training duration from json
 duration_trng = 5 * 60 # mins, secs
 
 # Indexes of all landmarks
