@@ -28,7 +28,7 @@ pose_angles = detector.poses[pose_name]['start']['angles']
 
 is_corr_pose = False
 
-label_next_pose = pose_name.capitalize() + cons.lbl_pose
+top_label = pose_name.capitalize() + cons.lbl_pose
 
 trng_time_left = cons.duration_trng
 prev_trng_curr_time = 0
@@ -36,8 +36,8 @@ trng_init_time = time.time()
 trng_curr_time = 0
 trng_mins, trng_secs = divmod(trng_time_left, 60)
 
-pause_bttn_lbl = '{:02d}:{:02d}'.format(trng_mins, trng_secs)
-pause_bttn_text_size = cons.fnt_size_timer
+pause_bttn_lbl = cons.lbl_pause + ' {:02d}:{:02d}'.format(trng_mins, trng_secs)
+# pause_bttn_text_size = cons.fnt_size_timer
 pause_bttn_curr_rec_width = 0
 
 next_bttn_curr_rec_width = 0
@@ -65,6 +65,8 @@ hand_in_yoga_butt_curr_time = 0
 hand_in_workout_butt_inittime = time.time()
 hand_in_workout_butt_curr_time = 0
 
+pause_bttn_update = True
+
 
 yoga_active = False
 workout_active = False
@@ -77,14 +79,13 @@ show_next_bttn = True
 
 # pause_bttn_active = True
 # next_bttn_active = True
-pause_bttn_update = True
-exit_butt_active = False
-cont_butt_active = False
-yoga_butt_active = True
-workout_butt_active = True
+# exit_butt_active = False
+# cont_butt_active = False
+# yoga_butt_active = True
+# workout_butt_active = True
 
-lhand_in_pause_bttn = False
-rhand_in_pause_bttn = False
+# lhand_in_pause_bttn = False
+# rhand_in_pause_bttn = False
 lhand_in_next_bttn = False
 rhand_in_next_bttn = False
 lhand_in_exit_butt = False
@@ -107,6 +108,8 @@ some_bttn_active = False
 
 menu = MenuController()
 
+detecting = True
+trng_done = False
 
 # Background video 
 bg_video_name = os.path.join(dirname, 'pose_1' + cons.format_video)
@@ -127,15 +130,11 @@ while cap.isOpened():
 
     if lmks:
         
-
-
-
         # Hands Menu Control
         lhand_x, lhand_y, _ = lmks[cons.RIGHT_INDEX]
         rhand_x, rhand_y, _ = lmks[cons.LEFT_INDEX]
 
         menu.set_hands_coords(lmks)
-
 
 
         # Youga
@@ -161,21 +160,22 @@ while cap.isOpened():
                     bg_image[:] = img_back
                     img = np.where(condition, img, bg_image)
 
-
-            # Update pose label if training is done
-            if label_next_pose == cons.lbl_done:
-                label_clr = cons.clr_green
-                label_next_pose = cons.lbl_done
             # Detect pose
-            else:
+            if detecting:
                 is_corr_pose = detector.correct_pose(img, lmks, pose_angles, draw=True)
                 # Change pose label
-                label_next_pose = (pose_name.capitalize() + cons.lbl_pose) if is_corr_pose else cons.lbl_correct_limbs
+                top_label = (pose_name.capitalize() + cons.lbl_pose) if is_corr_pose else cons.lbl_correct_limbs
                 # Change pose label color
                 label_clr = cons.clr_green if is_corr_pose else cons.clr_red
 
             # Write the pose label on the output image. 
-            cv2.putText(img, label_next_pose, (400, 75), cv2.FONT_HERSHEY_DUPLEX, cons.fnt_size_menu, label_clr, cons.fnt_thick)
+            cv2.putText(img, 
+                        top_label, 
+                        (400, 75), 
+                        cv2.FONT_HERSHEY_DUPLEX, 
+                        cons.fnt_size_menu, 
+                        label_clr, 
+                        cons.fnt_thick)
             
             # Training timer
             pause_bttn_pos_x = 10
@@ -198,16 +198,31 @@ while cap.isOpened():
                         trng_time_left -= 1
 
                         trng_mins, trng_secs = divmod(trng_time_left, 60)
-                        pause_bttn_lbl = '{:02d}:{:02d}'.format(trng_mins, trng_secs)
+                        pause_bttn_lbl = cons.lbl_pause + ' {:02d}:{:02d}'.format(trng_mins, trng_secs)
                 else:
-                    pause_bttn_lbl= cons.lbl_time_end
-                    pause_bttn_text_size -= 1
-
+                    pause_bttn_lbl= cons.lbl_pause
+                    # Stop filling pause bttn background
+                    pause_bttn_curr_rec_width = pause_bttn_width
                     trng_init_time = time.time()
+
+                    top_label = cons.lbl_time_end
+                    menu.next_bttn_active = False
+                    some_bttn_active = False
+
+                    # Pause video
+                    cap_backgrd_paused = True
+                    paused_img_back = img_back
+
+                    # Stop Pause button updating
+                    pause_bttn_update = False
+
+                    detecting = False
+
             else:
                 trng_init_time = time.time()
 
             if show_pause_bttn:
+
                 #Draw training timer
                 cv2.rectangle(img, 
                             (pause_bttn_pos_x, pause_bttn_pos_y), 
@@ -220,35 +235,20 @@ while cap.isOpened():
                             cons.clr_gray, 
                             cv2.FILLED)
 
-                if trng_time_left > 0:
-                    cv2.rectangle(img, 
-                                (pause_bttn_pos_x, pause_bttn_pos_y), 
-                                (pause_bttn_pos_x + pause_bttn_curr_rec_width, pause_bttn_pos_y + pause_bttn_height), 
-                                cons.clr_black, 
-                                cv2.FILLED)
-                else:
-                    cv2.rectangle(img, 
-                                (pause_bttn_pos_x, pause_bttn_pos_y), 
-                                (pause_bttn_pos_x + pause_bttn_width, pause_bttn_pos_y + pause_bttn_height), 
-                                cons.clr_black, 
-                                cv2.FILLED)
-                
+                cv2.rectangle(img, 
+                            (pause_bttn_pos_x, pause_bttn_pos_y), 
+                            (pause_bttn_pos_x + pause_bttn_curr_rec_width, pause_bttn_pos_y + pause_bttn_height), 
+                            cons.clr_black, 
+                            cv2.FILLED)
+
                 #Training timer text
                 cv2.putText(img, 
-                            cons.lbl_pause, 
+                            pause_bttn_lbl, 
                             (pause_bttn_pos_x + 5, pause_bttn_pos_y + 65), 
                             cv2.FONT_HERSHEY_DUPLEX, 
                             cons.fnt_size_menu, 
                             cons.clr_white, 
                             cons.fnt_thick)
-                cv2.putText(img, 
-                            pause_bttn_lbl, 
-                            (pause_bttn_pos_x + 115, pause_bttn_pos_y + 65), 
-                            cv2.FONT_HERSHEY_DUPLEX, 
-                            pause_bttn_text_size, 
-                            cons.clr_white, 
-                            cons.fnt_thick)
-
             
             #Pose timer
             next_bttn_pos_y = 10
@@ -281,46 +281,19 @@ while cap.isOpened():
                         pose_time_left = pose_duration
                         next_bttn_curr_rec_width = 0
 
-                        # pose_contr.update_pose(
-                        #     # Check if user is done training
-                        #     if not trng_seq:
-                        #         label_next_pose = cons.lbl_done
-                        #         menu.next_bttn_active = False
-                        #         menu.some_bttn_active = False
-                        #     # Reset pose variables to next pose
-                        #     elif is_corr_pose:
-                        #         is_corr_pose = False
-                        #         # Set next pose
-                        #         pose_name = trng_seq.pop(0)
-                        #         # Set new values to pose variables 
-                        #         label_next_pose = pose_name.capitalize() + cons.lbl_pose
-                        #         pose_duration = detector.poses[pose_name]['duration']
-                        #         pose_angles = detector.poses[pose_name]['start']['angles']
-                        # )
-
-                        # Check if user is done training
-                        if not trng_seq:
-                            label_next_pose = cons.lbl_done
-                            menu.next_bttn_active = False
-                            some_bttn_active = False
-
-                            # Pause video
-                            cap_backgrd_paused = True
-                            paused_img_back = img_back
-
-                            # Stop Pause button updating
-                            pause_bttn_update = False
-
-
                         # Reset pose variables to next pose
-                        elif is_corr_pose:
+                        if is_corr_pose:
                             is_corr_pose = False
-                            # Set next pose
-                            pose_name = trng_seq.pop(0)
-                            # Set new values to pose variables 
-                            label_next_pose = pose_name.capitalize() + cons.lbl_pose
-                            pose_duration = detector.poses[pose_name]['duration']
-                            pose_angles = detector.poses[pose_name]['start']['angles']
+
+                            if trng_seq:
+                                # Set next pose
+                                pose_name = trng_seq.pop(0)
+                                # Set new values to pose variables 
+                                top_label = pose_name.capitalize() + cons.lbl_pose
+                                pose_duration = detector.poses[pose_name]['duration']
+                                pose_angles = detector.poses[pose_name]['start']['angles']
+                            else:
+                                trng_done = True
                 else:
                     pose_init_time = time.time()
 
@@ -337,19 +310,12 @@ while cap.isOpened():
                                 cons.clr_gray, 
                                 cv2.FILLED)
                 
-                if pose_time_left > 0:
-                    cv2.rectangle(img, 
+                cv2.rectangle(img, 
                                 (next_bttn_pos_x, next_bttn_pos_y), 
                                 (next_bttn_pos_x + next_bttn_curr_rec_width, next_bttn_pos_y + next_bttn_height), 
                                 cons.clr_black, 
                                 cv2.FILLED)
-                else:
-                    cv2.rectangle(img, 
-                                (next_bttn_pos_x, next_bttn_pos_y), 
-                                (next_bttn_pos_x + next_bttn_width, next_bttn_pos_y + next_bttn_height), 
-                                cons.clr_black, 
-                                cv2.FILLED)
-               
+
                 # Pose timer text
                 cv2.putText(img, 
                             cons.lbl_next, 
@@ -362,6 +328,11 @@ while cap.isOpened():
             
             # Pause button
             if menu.pause_bttn_active:
+                # pause_bttn_pos_x = 10
+                # pause_bttn_pos_y = 10
+                # pause_bttn_width = 300
+                # pause_bttn_height = 100
+
                 lhand_x_in_pause_bttn_x = lhand_x > pause_bttn_pos_x and lhand_x < (pause_bttn_pos_x + pause_bttn_width)
                 lhand_y_in_pause_bttn_y = lhand_y > pause_bttn_pos_y and lhand_y < (pause_bttn_pos_y + pause_bttn_height)
                 lhand_in_pause_bttn = lhand_x_in_pause_bttn_x and lhand_y_in_pause_bttn_y
@@ -371,22 +342,25 @@ while cap.isOpened():
                 rhand_in_pause_bttn = rhand_x_in_pause_bttn_x and rhand_y_in_pause_bttn_y
 
                 # Detect if hand in button area
+                # if menu.hand_focus(view.train.bttns.pause)
                 if (lhand_in_pause_bttn or rhand_in_pause_bttn) and not some_bttn_active:
                     cv2.rectangle(img, 
                                 (pause_bttn_pos_x, pause_bttn_pos_y), 
                                 (pause_bttn_pos_x + pause_bttn_width, pause_bttn_pos_y + pause_bttn_height), 
                                 cons.clr_green, 
                                 cons.fnt_thick)
-                                
+                    
                     # Detect 'tap' on pause_bttn
                     hand_in_pause_bttn_curr_time = int(time.time() - hand_in_pause_bttn_inittime)
                     if hand_in_pause_bttn_curr_time >= cons.time_tap and not pause_bttn_tapped:
                         # Turn off other buttons
                         some_bttn_active = True
 
+                        menu.exit_butt_active = True
+                        menu.cont_butt_active = True
+                        pause_bttn_tapped = True
+
                         show_paused_bttns = True
-                        exit_butt_active = True
-                        cont_butt_active = True
 
                         # Pause video
                         cap_backgrd_paused = True
@@ -395,13 +369,15 @@ while cap.isOpened():
                         # Stop Pause button updating
                         pause_bttn_update = False
 
+                        detecting = False
+
                         cv2.rectangle(img, 
                                 (pause_bttn_pos_x, pause_bttn_pos_y), 
                                 (pause_bttn_pos_x + pause_bttn_width, pause_bttn_pos_y + pause_bttn_height), 
                                 cons.clr_green, 
                                 cv2.FILLED)
 
-                        pause_bttn_tapped = True
+                        
                 else:
                     hand_in_pause_bttn_inittime = time.time()
                     pause_bttn_tapped = False
@@ -416,7 +392,7 @@ while cap.isOpened():
                 menu.next_bttn_active = False
 
                 # Exit button
-                if exit_butt_active:
+                if menu.exit_butt_active:
                     
                     # Draw exit button
                     exit_butt_pos_x = int(cons.window_width / 5.5)
@@ -457,7 +433,7 @@ while cap.isOpened():
                         # Detect 'tap' on exit_butt
                         hand_in_exit_butt_curr_time = int(time.time() - hand_in_exit_butt_inittime)
                         if hand_in_exit_butt_curr_time >= cons.time_tap and not exit_butt_tapped:
-                             # Turn off other buttons
+                            # Turn off other buttons
                             some_bttn_active = True
 
                             cv2.rectangle(img, 
@@ -466,13 +442,14 @@ while cap.isOpened():
                                     cons.clr_green, 
                                     cv2.FILLED)
                             
-                            exit_butt_active = False
+                            menu.exit_butt_active = False
                             show_paused_bttns = False
                             yoga_active = False
-                            yoga_butt_active = True
-                            workout_butt_active = True
+                            menu.yoga_butt_active = True
+                            menu.workout_butt_active = True
 
                             exit_butt_tapped = True
+
 
                     else:
                         hand_in_exit_butt_inittime = time.time()
@@ -483,7 +460,7 @@ while cap.isOpened():
                 
 
                 # Cont button
-                if cont_butt_active:
+                if menu.cont_butt_active:
                     # Draw continue button
                     cont_butt_pos_x = exit_butt_pos_x + exit_butt_width + 60
                     cont_butt_pos_y = 200
@@ -521,9 +498,11 @@ while cap.isOpened():
                             # Turn off other buttons
                             some_bttn_active = True
 
-                            cont_butt_active = False
+                            menu.cont_butt_active = False
                             show_paused_bttns = False
                             menu.pause_bttn_active = True
+
+                            detecting = True
 
                             if trng_seq:
                                 menu.next_bttn_active = True
@@ -569,49 +548,18 @@ while cap.isOpened():
                         some_bttn_active = True
 
                         pose_time_left = pose_duration
+
                         next_bttn_curr_rec_width = 0
 
-                        # pose_contr.update_pose (
-                        #     # Check if user is done training
-                        #     if not trng_seq:
-                        #         label_next_pose = cons.lbl_done
-                        #         menu.next_bttn_active = False
-                        #         menu.some_bttn_active = False
-                        #     # Reset pose variables to next pose
-                        #     elif is_corr_pose:
-                        #         is_corr_pose = False
-                        #         # Set next pose
-                        #         pose_name = trng_seq.pop(0)
-                        #         # Set new values to pose variables 
-                        #         label_next_pose = pose_name.capitalize() + cons.lbl_pose
-                        #         pose_duration = detector.poses[pose_name]['duration']
-                        #         pose_angles = detector.poses[pose_name]['start']['angles']
-                        # )
-                        
-                        #TODO: DRY
-                        # Check if user is done training
-                        if not trng_seq:
-                            label_next_pose = cons.lbl_done
-                            menu.next_bttn_active = False
-                            some_bttn_active = False
-
-                            # Pause video
-                            cap_backgrd_paused = True
-                            paused_img_back = img_back
-
-                            # Stop Pause button updating
-                            pause_bttn_update = False
-
-                        # Reset pose variables to next pose
-                        else:
-
-                            # Set next pose
+                        # Set next pose
+                        if trng_seq:
                             pose_name = trng_seq.pop(0)
                             # Set new values to pose variables 
-                            label_next_pose = pose_name.capitalize() + cons.lbl_pose
+                            top_label = pose_name.capitalize() + cons.lbl_pose
                             pose_duration = detector.poses[pose_name]['duration']
                             pose_angles = detector.poses[pose_name]['start']['angles']
-
+                        else:
+                            trng_done = True
 
                         cv2.rectangle(img, 
                                 (next_bttn_pos_x, next_bttn_pos_y), 
@@ -626,10 +574,24 @@ while cap.isOpened():
                     next_bttn_tapped = False
                     # Turn on other buttons
                     some_bttn_active = False
+            
+            # Check if user is done training
+            if trng_done:
+                top_label = cons.lbl_done
+                menu.next_bttn_active = False
+                some_bttn_active = False
 
+                # Pause video
+                cap_backgrd_paused = True
+                paused_img_back = img_back
 
+                # Stop Pause button updating
+                pause_bttn_update = False
+
+                detecting = False
+            
         # Menu buttons
-        if yoga_butt_active:
+        if menu.yoga_butt_active:
             # Draw yoga button
             yoga_butt_pos_x = 10
             yoga_butt_pos_y = 10
@@ -653,7 +615,7 @@ while cap.isOpened():
                         cons.fnt_thick)
 
             # Tap yoga button
-            if yoga_butt_active:
+            if menu.yoga_butt_active:
                 lhand_x_in_yoga_butt_x = lhand_x > yoga_butt_pos_x and lhand_x < (yoga_butt_pos_x + yoga_butt_width)
                 lhand_y_in_yoga_butt_y = lhand_y > yoga_butt_pos_y and lhand_y < (yoga_butt_pos_y + yoga_butt_height)
                 lhand_in_yoga_butt = lhand_x_in_yoga_butt_x and lhand_y_in_yoga_butt_y
@@ -686,15 +648,15 @@ while cap.isOpened():
                         pose_duration = detector.poses[pose_name]['duration']
                         pose_angles = detector.poses[pose_name]['start']['angles']
 
-                        label_next_pose = pose_name.capitalize() + cons.lbl_pose
+                        top_label = pose_name.capitalize() + cons.lbl_pose
 
                         trng_time_left = cons.duration_trng
-                        pause_bttn_text_size = cons.fnt_size_timer
+                        # pause_bttn_text_size = cons.fnt_size_timer
                         pause_bttn_curr_rec_width = 0
                         trng_init_time = time.time()
                         prev_trng_curr_time = 0
                         trng_mins, trng_secs = divmod(trng_time_left, 60)
-                        pause_bttn_lbl = '{:02d}:{:02d}'.format(trng_mins, trng_secs)
+                        pause_bttn_lbl = cons.lbl_pause + ' {:02d}:{:02d}'.format(trng_mins, trng_secs)
 
                         pose_time_left = pose_duration
                         next_bttn_curr_rec_width = 0
@@ -710,11 +672,11 @@ while cap.isOpened():
 
                         some_bttn_active = False
 
-                        exit_butt_active = False
-                        cont_butt_active = False
+                        menu.exit_butt_active = False
+                        menu.cont_butt_active = False
 
-                        yoga_butt_active = False
-                        workout_butt_active = False
+                        menu.yoga_butt_active = False
+                        menu.workout_butt_active = False
 
                         yoga_active = True
                         workout_active = False
@@ -723,6 +685,9 @@ while cap.isOpened():
 
                         cap_backgrd_paused = False
                         paused_img_back = []
+
+                        detecting = True
+                        trng_done = False
 
                         cv2.rectangle(img, 
                                 (yoga_butt_pos_x, yoga_butt_pos_y), 
@@ -736,7 +701,7 @@ while cap.isOpened():
                     # Turn on other buttons
                     some_bttn_active = False
 
-        if workout_butt_active:
+        if menu.workout_butt_active:
             # Draw workout button
             workout_butt_pos_x = 650 # yoga_butt_pos_x + yoga_butt_width + 40
             workout_butt_pos_y = 10
@@ -759,7 +724,7 @@ while cap.isOpened():
                         cons.fnt_thick)
 
             # Tap workout button
-            if workout_butt_active:
+            if menu.workout_butt_active:
                 lhand_x_in_workout_butt_x = lhand_x > workout_butt_pos_x and lhand_x < (workout_butt_pos_x + workout_butt_width)
                 lhand_y_in_workout_butt_y = lhand_y > workout_butt_pos_y and lhand_y < (workout_butt_pos_y + workout_butt_height)
                 lhand_in_workout_butt = lhand_x_in_workout_butt_x and lhand_y_in_workout_butt_y
@@ -792,15 +757,15 @@ while cap.isOpened():
                         pose_duration = detector.poses[pose_name]['duration']
                         pose_angles = detector.poses[pose_name]['start']['angles']
 
-                        label_next_pose = pose_name.capitalize() + cons.lbl_pose
+                        top_label = pose_name.capitalize() + cons.lbl_pose
 
                         trng_time_left = cons.duration_trng
-                        pause_bttn_text_size = cons.fnt_size_timer
+                        # pause_bttn_text_size = cons.fnt_size_timer
                         pause_bttn_curr_rec_width = 0
                         trng_init_time = time.time()
                         prev_trng_curr_time = 0
                         trng_mins, trng_secs = divmod(trng_time_left, 60)
-                        pause_bttn_lbl = '{:02d}:{:02d}'.format(trng_mins, trng_secs)
+                        pause_bttn_lbl = cons.lbl_pause + ' {:02d}:{:02d}'.format(trng_mins, trng_secs)
 
                         pose_time_left = pose_duration
                         next_bttn_curr_rec_width = 0
@@ -816,17 +781,20 @@ while cap.isOpened():
 
                         some_bttn_active = False
 
-                        exit_butt_active = False
-                        cont_butt_active = False
+                        menu.exit_butt_active = False
+                        menu.cont_butt_active = False
 
-                        yoga_butt_active = False
-                        workout_butt_active = False
+                        menu.yoga_butt_active = False
+                        menu.workout_butt_active = False
 
                         yoga_active = True
                         workout_active = False
 
                         cap_backgrd_paused = False
                         paused_img_back = []
+
+                        detecting = True
+                        trng_done = False
 
                         cv2.rectangle(img, 
                                 (workout_butt_pos_x, workout_butt_pos_y), 

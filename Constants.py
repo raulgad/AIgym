@@ -82,7 +82,6 @@ lbl_workout = 'Workout'
 lbl_correct_limbs = 'Correct red limbs'
 
 # Font Sizes
-fnt_size_timer = 2
 fnt_size_menu = 1
 fnt_thick = 2
 
