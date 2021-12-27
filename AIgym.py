@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import time
-from MenuController import MenuController
+from Controller.ControllerHands import ControllerHands
 import PoseModule as pm
 import os
 import Constants as cons
@@ -106,7 +106,7 @@ workout_butt_tapped = False
 
 some_bttn_active = False
 
-menu = MenuController()
+ctrl_hands = ControllerHands()
 
 detecting = True
 trng_done = False
@@ -134,7 +134,7 @@ while cap.isOpened():
         lhand_x, lhand_y, _ = lmks[cons.RIGHT_INDEX]
         rhand_x, rhand_y, _ = lmks[cons.LEFT_INDEX]
 
-        menu.set_hands_coords(lmks)
+        ctrl_hands.set(lmks)
 
 
         # Youga
@@ -206,7 +206,7 @@ while cap.isOpened():
                     trng_init_time = time.time()
 
                     top_label = cons.lbl_time_end
-                    menu.next_bttn_active = False
+                    ctrl_hands.next_bttn_active = False
                     some_bttn_active = False
 
                     # Pause video
@@ -257,7 +257,7 @@ while cap.isOpened():
             next_bttn_pos_x = 650  # window_width - next_bttn_width - 10
             next_bttn_width_step = next_bttn_width / pose_duration
             # Change pose timer button if it active
-            if menu.next_bttn_active:
+            if ctrl_hands.next_bttn_active:
                 # Change anything only if we detect any pose
                 if is_corr_pose:
                     # Fill pose timer button by increasing filled button's rectangle each time when
@@ -327,7 +327,7 @@ while cap.isOpened():
             
             
             # Pause button
-            if menu.pause_bttn_active:
+            if ctrl_hands.pause_bttn_active:
                 # pause_bttn_pos_x = 10
                 # pause_bttn_pos_y = 10
                 # pause_bttn_width = 300
@@ -356,8 +356,8 @@ while cap.isOpened():
                         # Turn off other buttons
                         some_bttn_active = True
 
-                        menu.exit_butt_active = True
-                        menu.cont_butt_active = True
+                        ctrl_hands.exit_butt_active = True
+                        ctrl_hands.cont_butt_active = True
                         pause_bttn_tapped = True
 
                         show_paused_bttns = True
@@ -388,11 +388,11 @@ while cap.isOpened():
             if show_paused_bttns:
                 
                 # Deactivate pause_bttn and next_bttn buttons
-                menu.pause_bttn_active = False
-                menu.next_bttn_active = False
+                ctrl_hands.pause_bttn_active = False
+                ctrl_hands.next_bttn_active = False
 
                 # Exit button
-                if menu.exit_butt_active:
+                if ctrl_hands.exit_butt_active:
                     
                     # Draw exit button
                     exit_butt_pos_x = int(cons.window_width / 5.5)
@@ -442,11 +442,11 @@ while cap.isOpened():
                                     cons.clr_green, 
                                     cv2.FILLED)
                             
-                            menu.exit_butt_active = False
+                            ctrl_hands.exit_butt_active = False
                             show_paused_bttns = False
                             yoga_active = False
-                            menu.yoga_butt_active = True
-                            menu.workout_butt_active = True
+                            ctrl_hands.yoga_butt_active = True
+                            ctrl_hands.workout_butt_active = True
 
                             exit_butt_tapped = True
 
@@ -460,7 +460,7 @@ while cap.isOpened():
                 
 
                 # Cont button
-                if menu.cont_butt_active:
+                if ctrl_hands.cont_butt_active:
                     # Draw continue button
                     cont_butt_pos_x = exit_butt_pos_x + exit_butt_width + 60
                     cont_butt_pos_y = 200
@@ -498,14 +498,14 @@ while cap.isOpened():
                             # Turn off other buttons
                             some_bttn_active = True
 
-                            menu.cont_butt_active = False
+                            ctrl_hands.cont_butt_active = False
                             show_paused_bttns = False
-                            menu.pause_bttn_active = True
+                            ctrl_hands.pause_bttn_active = True
 
                             detecting = True
 
                             if trng_seq:
-                                menu.next_bttn_active = True
+                                ctrl_hands.next_bttn_active = True
                                 cap_backgrd_paused = False
                                 pause_bttn_update = True
 
@@ -525,7 +525,7 @@ while cap.isOpened():
 
 
             # next_bttn
-            if menu.next_bttn_active:
+            if ctrl_hands.next_bttn_active:
                 lhand_x_in_next_bttn_x = lhand_x > next_bttn_pos_x and lhand_x < (next_bttn_pos_x + next_bttn_width)
                 lhand_y_in_next_bttn_y = lhand_y > next_bttn_pos_y and lhand_y < (next_bttn_pos_y + next_bttn_height)
                 lhand_in_next_bttn = lhand_x_in_next_bttn_x and lhand_y_in_next_bttn_y
@@ -578,7 +578,7 @@ while cap.isOpened():
             # Check if user is done training
             if trng_done:
                 top_label = cons.lbl_done
-                menu.next_bttn_active = False
+                ctrl_hands.next_bttn_active = False
                 some_bttn_active = False
 
                 # Pause video
@@ -591,7 +591,7 @@ while cap.isOpened():
                 detecting = False
             
         # Menu buttons
-        if menu.yoga_butt_active:
+        if ctrl_hands.yoga_butt_active:
             # Draw yoga button
             yoga_butt_pos_x = 10
             yoga_butt_pos_y = 10
@@ -615,7 +615,7 @@ while cap.isOpened():
                         cons.fnt_thick)
 
             # Tap yoga button
-            if menu.yoga_butt_active:
+            if ctrl_hands.yoga_butt_active:
                 lhand_x_in_yoga_butt_x = lhand_x > yoga_butt_pos_x and lhand_x < (yoga_butt_pos_x + yoga_butt_width)
                 lhand_y_in_yoga_butt_y = lhand_y > yoga_butt_pos_y and lhand_y < (yoga_butt_pos_y + yoga_butt_height)
                 lhand_in_yoga_butt = lhand_x_in_yoga_butt_x and lhand_y_in_yoga_butt_y
@@ -664,19 +664,19 @@ while cap.isOpened():
                         prev_pose_curr_time = 0
 
                         show_paused_bttns = False
-                        menu.pause_bttn_active = True
+                        ctrl_hands.pause_bttn_active = True
                         pause_bttn_update = True
                         show_pause_bttn = True
-                        menu.next_bttn_active = True
+                        ctrl_hands.next_bttn_active = True
                         show_next_bttn = True
 
                         some_bttn_active = False
 
-                        menu.exit_butt_active = False
-                        menu.cont_butt_active = False
+                        ctrl_hands.exit_butt_active = False
+                        ctrl_hands.cont_butt_active = False
 
-                        menu.yoga_butt_active = False
-                        menu.workout_butt_active = False
+                        ctrl_hands.yoga_butt_active = False
+                        ctrl_hands.workout_butt_active = False
 
                         yoga_active = True
                         workout_active = False
@@ -701,7 +701,7 @@ while cap.isOpened():
                     # Turn on other buttons
                     some_bttn_active = False
 
-        if menu.workout_butt_active:
+        if ctrl_hands.workout_butt_active:
             # Draw workout button
             workout_butt_pos_x = 650 # yoga_butt_pos_x + yoga_butt_width + 40
             workout_butt_pos_y = 10
@@ -724,7 +724,7 @@ while cap.isOpened():
                         cons.fnt_thick)
 
             # Tap workout button
-            if menu.workout_butt_active:
+            if ctrl_hands.workout_butt_active:
                 lhand_x_in_workout_butt_x = lhand_x > workout_butt_pos_x and lhand_x < (workout_butt_pos_x + workout_butt_width)
                 lhand_y_in_workout_butt_y = lhand_y > workout_butt_pos_y and lhand_y < (workout_butt_pos_y + workout_butt_height)
                 lhand_in_workout_butt = lhand_x_in_workout_butt_x and lhand_y_in_workout_butt_y
@@ -773,19 +773,19 @@ while cap.isOpened():
                         prev_pose_curr_time = 0
 
                         show_paused_bttns = False
-                        menu.pause_bttn_active = True
+                        ctrl_hands.pause_bttn_active = True
                         pause_bttn_update = True
                         show_pause_bttn = True
-                        menu.next_bttn_active = True
+                        ctrl_hands.next_bttn_active = True
                         show_next_bttn = True
 
                         some_bttn_active = False
 
-                        menu.exit_butt_active = False
-                        menu.cont_butt_active = False
+                        ctrl_hands.exit_butt_active = False
+                        ctrl_hands.cont_butt_active = False
 
-                        menu.yoga_butt_active = False
-                        menu.workout_butt_active = False
+                        ctrl_hands.yoga_butt_active = False
+                        ctrl_hands.workout_butt_active = False
 
                         yoga_active = True
                         workout_active = False

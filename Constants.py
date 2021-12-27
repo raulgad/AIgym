@@ -7,7 +7,7 @@ name_app = 'AIgym'
 format_video = '.mp4'
 
 # Files
-f_poses = 'poses.json'
+f_poses = 'Model/poses.json'
 
 # Video
 camera_id = 0
@@ -96,8 +96,11 @@ kbrd_quit = 'q'
 num_big = 1000000000000
 
 # View
-view_circle_rad = 10
-view_circle_filled_rad = 5
+vw_train_circle_rad = 10
+vw_train_circle_filled_rad = 5
+vw_bttn_spacing = 10
+vw_bttn_width = 0.3
+vw_bttn_height = 0.185
 
 # Agnles
 ang_pose_detect_gap = 20.0

@@ -1,11 +1,11 @@
 import Constants as cons
 
-class MenuController:
+class ControllerHands:
     """
-    Responsible for the logic of the menu buttons
+    Responsible for the logic of remote hands controll
     """
 
-    def __init__(self) -> None:
+    def __init__(self):
         self.pause_bttn_active = True
         self.next_bttn_active = True
         self.exit_butt_active = False
@@ -35,12 +35,13 @@ class MenuController:
 
         self.some_bttn_active = False
         
-    def set_hands_coords(self, lmks):
+    def set(self, lmks):
         # Set current coordinates of left (l) and right (r) hands
-        self.l_x, self.l_y, _ = lmks[cons.RIGHT_INDEX]
-        self.r_x, self.r_y, _ = lmks[cons.LEFT_INDEX]
+        if lmks:
+            self.l_x, self.l_y, _ = lmks[cons.RIGHT_INDEX]
+            self.r_x, self.r_y, _ = lmks[cons.LEFT_INDEX]
 
-    def hand_focus(self, bttn) -> bool:
+    def focus(self, bttn) -> bool:
         # Return if user hand in button area and not some other button is active
         # Check if left hand in the area
         l_x_in_bttn_x = self.l_x > bttn.x and self.l_x < (bttn.x + bttn.width)
