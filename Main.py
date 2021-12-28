@@ -1,35 +1,29 @@
+import logging
 import cv2
-import os
-import time
 import Constants as cons
 import Extensions as extn
-from View.ViewMain import ViewMain
 from Controller.ControllerMain import ControllerMain
 from Controller.ControllerHands import ControllerHands
 from Router import Router as router
 
 def main():
-    # Setup main view of the app
-    # vw_main = ViewMain()
-
-    # Setup main controller
-    ctrl_main = ControllerMain(view = ViewMain())
     # Setup hands remote controller
     ctrl_hands = ControllerHands()
-
+    # Setup main controller
+    ctrl_main = ControllerMain(ctrl_hands)
     # Get frame from the camera
     while ctrl_main.view.cap.isOpened():
         success, frame = ctrl_main.view.cap.read()
         if success:
             # Preprocess frame
             ctrl_main.view.preprocess(frame)
-
-            # Set pose landmarks and segmentation mask
-            ctrl_main.analyze()
+            # Detect pose landmarks and segmentation mask
+            ctrl_main.analyze_user()
             ctrl_hands.set(ctrl_main.lmks)
-            # Draw main view
-            router.go(ctrl_main.view)
-
+            # Show main view
+            router.segue(ctrl_main.view)
+            # Handle if user tap on yoga or workout button
+            ctrl_main.main()
 
             extn.draw_fps(ctrl_main.view.frame)
 
@@ -39,7 +33,7 @@ def main():
             if ctrl_main.is_quit(): break
 
         else:
-            print('Cant read frame from the camera -> cap.read()')
+            logging.debug('Cant read frame from the camera -> cap.read()')
             break
 
 if __name__ == "__main__":

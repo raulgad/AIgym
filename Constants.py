@@ -1,4 +1,7 @@
 import mediapipe as mp
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 # Names
 name_app = 'AIgym'
@@ -101,6 +104,7 @@ vw_train_circle_filled_rad = 5
 vw_bttn_spacing = 10
 vw_bttn_width = 0.3
 vw_bttn_height = 0.185
+vw_bttn_frame_thick = 6
 
-# Agnles
+# Angles
 ang_pose_detect_gap = 20.0

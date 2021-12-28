@@ -1,6 +1,5 @@
 import Constants as cons
 import cv2
-
 from View.ViewButton import ViewButton
 from View.ViewLabel import ViewLabel
 
@@ -8,7 +7,7 @@ class ViewMain:
     """
     Responsible for drawing main view
     """
-    def __init__(self):
+    def __init__(self, ctrl_hands):
         self.draw = True
         self.frame = []
         self.window_width = cons.window_width
@@ -20,18 +19,20 @@ class ViewMain:
         # Setup yoga button
         bttn_width = int(cons.vw_bttn_width * self.window_width)
         bttn_height = int(cons.vw_bttn_height * self.window_height)
-        self.yoga_bttn = ViewButton(x=cons.vw_bttn_spacing, y=cons.vw_bttn_spacing,
+        self.bttn_yoga = ViewButton(x=cons.vw_bttn_spacing, y=cons.vw_bttn_spacing,
                                     x_end=cons.vw_bttn_spacing + bttn_width, 
                                     y_end=cons.vw_bttn_spacing + bttn_height,
                                     label=ViewLabel(text=cons.lbl_yoga),
-                                    center_label=True)
+                                    center_label=True,
+                                    ctrl_hands=ctrl_hands)
         # Setup workout button
-        self.workout_bttn = ViewButton(x=self.window_width - (cons.vw_bttn_spacing + bttn_width), 
+        self.bttn_workout = ViewButton(x=self.window_width - (cons.vw_bttn_spacing + bttn_width), 
                                     y=cons.vw_bttn_spacing,
                                     x_end=self.window_width - cons.vw_bttn_spacing, 
                                     y_end=cons.vw_bttn_spacing + bttn_height,
                                     label=ViewLabel(text=cons.lbl_workout),
-                                    center_label=True)
+                                    center_label=True,
+                                    ctrl_hands=ctrl_hands)
 
 
         
@@ -54,9 +55,9 @@ class ViewMain:
     def appear(self):
         if self.draw:
             # Draw main buttons
-            self.yoga_bttn.draw(self.frame)
-            self.workout_bttn.draw(self.frame)
-            
+            self.bttn_yoga.draw(self.frame)
+            self.bttn_workout.draw(self.frame)
+
     def disappear(self):
         self.draw = False
 

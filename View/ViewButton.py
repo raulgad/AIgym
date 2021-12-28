@@ -8,9 +8,10 @@ class ViewButton:
     """
     def __init__(self, 
                 x, y, 
-                x_end, y_end, 
+                x_end, y_end,
+                ctrl_hands,
                 filled_divider=1, 
-                frame_thick=cons.fnt_thick, 
+                frame_thick=cons.vw_bttn_frame_thick, 
                 frame_clr=cons.clr_black, 
                 backgr_clr=cons.clr_black,
                 label=ViewLabel,
@@ -19,10 +20,11 @@ class ViewButton:
         self.x = x
         self.y = y
         self.x_end = x_end
-        self.fill_step = x_end / filled_divider
         self.y_end = y_end
+        self.ctrl_hands = ctrl_hands
         self.width = self.x_end - self.x
         self.height = self.y_end - self.y
+        self.fill_step = self.width / filled_divider
         self.frame_clr = frame_clr
         self.frame_thick = frame_thick
         self.backgr_clr = backgr_clr
@@ -34,11 +36,13 @@ class ViewButton:
 
 
     def draw(self, frame):
+        # Highlight button if hand in its area
+        frame_highlight_color = cons.clr_green if self.ctrl_hands.focus(self) else self.frame_clr
         # Draw button frame
         cv2.rectangle(frame, 
                         (self.x, self.y), 
                         (self.x_end, self.y_end), 
-                        self.frame_clr, 
+                        frame_highlight_color, 
                         self.frame_thick)
         # Draw button background. 
         # Button is filled if its frame color is equal the background color.
@@ -49,7 +53,7 @@ class ViewButton:
                         filled_clr, 
                         cv2.FILLED)
         # Draw button filled part
-        if self.fill_step > 0 and self.fill_step < self.x_end:
+        if self.fill_step > 0 and self.fill_step < self.width:
             cv2.rectangle(frame, 
                             (self.x, self.y), 
                             (self.x_end + self.fill_step, self.y_end), 
