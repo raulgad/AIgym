@@ -173,7 +173,7 @@ while cap.isOpened():
                         top_label, 
                         (400, 75), 
                         cv2.FONT_HERSHEY_DUPLEX, 
-                        cons.fnt_size_menu, 
+                        cons.fnt_scale_menu, 
                         label_clr, 
                         cons.fnt_thick)
             
@@ -246,7 +246,7 @@ while cap.isOpened():
                             pause_bttn_lbl, 
                             (pause_bttn_pos_x + 5, pause_bttn_pos_y + 65), 
                             cv2.FONT_HERSHEY_DUPLEX, 
-                            cons.fnt_size_menu, 
+                            cons.fnt_scale_menu, 
                             cons.clr_white, 
                             cons.fnt_thick)
             
@@ -321,7 +321,7 @@ while cap.isOpened():
                             cons.lbl_next, 
                             (next_bttn_pos_x + 100, next_bttn_pos_y + 65), 
                             cv2.FONT_HERSHEY_DUPLEX, 
-                            cons.fnt_size_menu, 
+                            cons.fnt_scale_menu, 
                             cons.clr_white, 
                             cons.fnt_thick)
             
@@ -411,7 +411,7 @@ while cap.isOpened():
                                 cons.lbl_exit, 
                                 (exit_butt_pos_x + 100, exit_butt_pos_y + 65), 
                                 cv2.FONT_HERSHEY_DUPLEX, 
-                                cons.fnt_size_menu, 
+                                cons.fnt_scale_menu, 
                                 cons.clr_white, 
                                 cons.fnt_thick)
 
@@ -474,7 +474,7 @@ while cap.isOpened():
                                 cv2.FILLED)
                     
                     # Exit button text
-                    cv2.putText(img, cons.lbl_continue, (cont_butt_pos_x + 80, cont_butt_pos_y + 65), cv2.FONT_HERSHEY_DUPLEX, cons.fnt_size_menu, 
+                    cv2.putText(img, cons.lbl_continue, (cont_butt_pos_x + 80, cont_butt_pos_y + 65), cv2.FONT_HERSHEY_DUPLEX, cons.fnt_scale_menu, 
                                 cons.clr_white, cons.fnt_thick)
 
                     lhand_x_in_cont_butt_x = lhand_x > cont_butt_pos_x and lhand_x < (cont_butt_pos_x + cont_butt_width)
@@ -610,7 +610,7 @@ while cap.isOpened():
                         cons.lbl_yoga, 
                         (yoga_butt_pos_x + 100, yoga_butt_pos_y + 65), 
                         cv2.FONT_HERSHEY_DUPLEX, 
-                        cons.fnt_size_menu, 
+                        cons.fnt_scale_menu, 
                         cons.clr_white, 
                         cons.fnt_thick)
 
@@ -719,7 +719,7 @@ while cap.isOpened():
                         cons.lbl_workout,
                         (workout_butt_pos_x + 100, workout_butt_pos_y + 65), 
                         cv2.FONT_HERSHEY_DUPLEX, 
-                        cons.fnt_size_menu, 
+                        cons.fnt_scale_menu, 
                         cons.clr_white, 
                         cons.fnt_thick)
 
@@ -815,7 +815,7 @@ while cap.isOpened():
     curr_time = time.time()
     fps = 1 / (curr_time - prev_time)
     prev_time = curr_time
-    cv2.putText(img, str(int(fps)), (50, 500), cv2.FONT_HERSHEY_DUPLEX, cons.fnt_size_menu, cons.clr_blue, cons.fnt_thick)
+    cv2.putText(img, str(int(fps)), (50, 500), cv2.FONT_HERSHEY_DUPLEX, cons.fnt_scale_menu, cons.clr_blue, cons.fnt_thick)
 
 
     cv2.imshow(cons.name_app, img)

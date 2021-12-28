@@ -15,17 +15,24 @@ class ViewMain:
         self.window_height = cons.window_height
         # Setup video from camera
         self.cap = cv2.VideoCapture(cons.camera_id)
-        self.set_window_size(self.cap)
+        self.set_window_size()
         cv2.namedWindow(cons.name_app, cv2.WINDOW_NORMAL)
-        # Setup buttons
-        yoga_bttn_x_end = cons.vw_bttn_spacing + int(cons.vw_bttn_width * self.window_width)
-        yoga_bttn_y_end = cons.vw_bttn_spacing + int(cons.vw_bttn_height * self.window_height)
-        yoga_bttn_label = ViewLabel(x=cons.vw_bttn_spacing + int(yoga_bttn_x_end / 3.2), 
-                                    y=cons.vw_bttn_spacing + int(yoga_bttn_y_end / 1.7),
-                                    text=cons.lbl_yoga)
+        # Setup yoga button
+        bttn_width = int(cons.vw_bttn_width * self.window_width)
+        bttn_height = int(cons.vw_bttn_height * self.window_height)
         self.yoga_bttn = ViewButton(x=cons.vw_bttn_spacing, y=cons.vw_bttn_spacing,
-                                    x_end=yoga_bttn_x_end, y_end=yoga_bttn_y_end,
-                                    label=yoga_bttn_label)
+                                    x_end=cons.vw_bttn_spacing + bttn_width, 
+                                    y_end=cons.vw_bttn_spacing + bttn_height,
+                                    label=ViewLabel(text=cons.lbl_yoga),
+                                    center_label=True)
+        # Setup workout button
+        self.workout_bttn = ViewButton(x=self.window_width - (cons.vw_bttn_spacing + bttn_width), 
+                                    y=cons.vw_bttn_spacing,
+                                    x_end=self.window_width - cons.vw_bttn_spacing, 
+                                    y_end=cons.vw_bttn_spacing + bttn_height,
+                                    label=ViewLabel(text=cons.lbl_workout),
+                                    center_label=True)
+
 
         
         # self.point_radius_inner = cons.vw_train_circle_filled_rad
@@ -34,24 +41,24 @@ class ViewMain:
         # # Setup background video 
         # bg_video_name = os.path.join(os.path.dirname(__file__), 'pose_1' + cons.format_video)
         # self.cap_backgrd = cv2.VideoCapture(bg_video_name)
-        # self.set_window_size(self.cap_backgrd)
+        # self.set_window_size()
     
     def preprocess(self, img):
         # Flip the frame horizontally for selfie-view
         self.frame = cv2.flip(img, cons.flip_hor)
-        return self.frame
 
-    def set_window_size(self, cap):
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.window_width)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.window_height) 
+    def set_window_size(self):
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.window_width)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.window_height) 
 
     def appear(self):
         if self.draw:
-            # Draw buttons
+            # Draw main buttons
             self.yoga_bttn.draw(self.frame)
+            self.workout_bttn.draw(self.frame)
             
-    def disappear():
-        pass
+    def disappear(self):
+        self.draw = False
 
 
 

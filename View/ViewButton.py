@@ -14,16 +14,24 @@ class ViewButton:
                 frame_clr=cons.clr_black, 
                 backgr_clr=cons.clr_black,
                 label=ViewLabel,
+                center_label=False,
                 ) -> None:
         self.x = x
         self.y = y
         self.x_end = x_end
         self.fill_step = x_end / filled_divider
         self.y_end = y_end
+        self.width = self.x_end - self.x
+        self.height = self.y_end - self.y
         self.frame_clr = frame_clr
         self.frame_thick = frame_thick
         self.backgr_clr = backgr_clr
         self.label = label
+        # Centerize label if needed
+        if center_label:
+            self.label.x = int(self.x + self.width / 2 - self.label.width / 2)
+            self.label.y = int(self.y + self.height / 2 + self.label.height / 2)
+
 
     def draw(self, frame):
         # Draw button frame
@@ -53,7 +61,7 @@ class ViewButton:
                         self.label.text, 
                         (self.label.x, self.label.y), 
                         self.label.font, 
-                        self.label.size, 
+                        self.label.scale, 
                         self.label.color, 
                         self.label.thick)
 

@@ -6,6 +6,7 @@ import Extensions as extn
 from View.ViewMain import ViewMain
 from Controller.ControllerMain import ControllerMain
 from Controller.ControllerHands import ControllerHands
+from Router import Router as router
 
 def main():
     # Setup main view of the app
@@ -26,8 +27,9 @@ def main():
             # Set pose landmarks and segmentation mask
             ctrl_main.analyze()
             ctrl_hands.set(ctrl_main.lmks)
+            # Draw main view
+            router.go(ctrl_main.view)
 
-            ctrl_main.view.appear()
 
             extn.draw_fps(ctrl_main.view.frame)
 
