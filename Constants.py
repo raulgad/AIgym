@@ -95,7 +95,7 @@ time_tap = 1 # seconds
 # Keyboard
 kbrd_quit = 'q'
 
-# Global
+# Common
 num_big = 1000000000000
 
 # View

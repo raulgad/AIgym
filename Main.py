@@ -3,13 +3,12 @@ import cv2
 import Constants as cons
 import Extensions as extn
 from Controller.ControllerMain import ControllerMain
-# from Controller.ControllerHands import ControllerHands
-import Controller.ControllerHands as ctrl_hands
-from Router import Router as router
+import Controller.ControllerHands as hands
+import Controller.ControllerDetector as detector
+# from Router import Router as router
 
 def main():
-    # Setup hands remote controller
-    # ctrl_hands = ControllerHands()
+    detector.init()
     # Setup main controller
     ctrl_main = ControllerMain()
     # Get frame from the camera
@@ -17,14 +16,18 @@ def main():
         success, frame = ctrl_main.view.cap.read()
         if success:
             # Preprocess frame
-            ctrl_main.view.preprocess(frame)
+            frame = extn.preprocess(frame)
             # Detect pose landmarks and segmentation mask
-            
-            ctrl_main.analyze_user()
-            ctrl_hands.set(ctrl_main.lmks)
+            detector.analyze_user(frame)
+
+            # Set hands coordinates for remote controll
+            hands.set()
 
             # Show main view
-            router.segue(ctrl_main.view)
+            ctrl_main.view.frame = frame
+            ctrl_main.view.appear()
+
+            # router.segue(ctrl_main.view)
 
             # Handle if user tap on yoga or workout button
             # ctrl_main.main()

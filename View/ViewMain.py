@@ -10,24 +10,24 @@ class ViewMain:
     def __init__(self):
         self.draw = True
         self.frame = []
-        self.window_width = cons.window_width
-        self.window_height = cons.window_height
+        self.width = cons.window_width
+        self.height = cons.window_height
         # Setup video from camera
         self.cap = cv2.VideoCapture(cons.camera_id)
         self.set_window_size()
         cv2.namedWindow(cons.name_app, cv2.WINDOW_NORMAL)
         # Setup yoga button
-        bttn_width = int(cons.vw_bttn_width * self.window_width)
-        bttn_height = int(cons.vw_bttn_height * self.window_height)
+        bttn_width = int(cons.vw_bttn_width * self.width)
+        bttn_height = int(cons.vw_bttn_height * self.height)
         self.bttn_yoga = ViewButton(x=cons.vw_bttn_spacing, y=cons.vw_bttn_spacing,
                                     x_end=cons.vw_bttn_spacing + bttn_width, 
                                     y_end=cons.vw_bttn_spacing + bttn_height,
                                     label=ViewLabel(text=cons.lbl_yoga),
                                     center_label=True)
         # Setup workout button
-        self.bttn_workout = ViewButton(x=self.window_width - (cons.vw_bttn_spacing + bttn_width), 
+        self.bttn_workout = ViewButton(x=self.width - (cons.vw_bttn_spacing + bttn_width), 
                                     y=cons.vw_bttn_spacing,
-                                    x_end=self.window_width - cons.vw_bttn_spacing, 
+                                    x_end=self.width - cons.vw_bttn_spacing, 
                                     y_end=cons.vw_bttn_spacing + bttn_height,
                                     label=ViewLabel(text=cons.lbl_workout),
                                     center_label=True)
@@ -41,14 +41,10 @@ class ViewMain:
         # bg_video_name = os.path.join(os.path.dirname(__file__), 'pose_1' + cons.format_video)
         # self.cap_backgrd = cv2.VideoCapture(bg_video_name)
         # self.set_window_size()
-    
-    def preprocess(self, img):
-        # Flip the frame horizontally for selfie-view
-        self.frame = cv2.flip(img, cons.flip_hor)
 
     def set_window_size(self):
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.window_width)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.window_height) 
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height) 
 
     def appear(self):
         if self.draw:

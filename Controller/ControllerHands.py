@@ -1,18 +1,18 @@
 import Constants as cons
+import Controller.ControllerDetector as detector
 
 """
-Responsible for the logic of remote hands controll
+Responsible for logic of remote hands controll
 """
-
 l_x, l_y, r_x, r_y  = 0, 0, 0, 0
 some_view_active = False
         
-def set(lmks):
-    global l_x, l_y, r_x, r_y
+def set():
     # Set current coordinates of left (l) and right (r) hands
-    if lmks:
-        l_x, l_y, _ = lmks[cons.RIGHT_INDEX]
-        r_x, r_y, _ = lmks[cons.LEFT_INDEX]
+    global l_x, l_y, r_x, r_y
+    if detector.lmks:
+        l_x, l_y, _ = detector.lmks[cons.RIGHT_INDEX]
+        r_x, r_y, _ = detector.lmks[cons.LEFT_INDEX]
 
 def point_between(point, between):
     return point > between[0] and point < (between[0] + between[1])

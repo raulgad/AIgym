@@ -1,14 +1,14 @@
 import cv2
 import Constants as cons
 import View.ViewLabel as ViewLabel
-import Controller.ControllerHands as ctrl_hands
+import Controller.ControllerHands as hands
 
 class ViewButton:
     """
     Responsible for button drawing
     """
     def __init__(self, 
-                x, y, 
+                x, y,
                 x_end, y_end,
                 filled_divider=1, 
                 frame_thick=cons.vw_bttn_frame_thick, 
@@ -36,7 +36,7 @@ class ViewButton:
 
     def draw(self, frame):
         # Highlight button if hand in its area
-        frame_highlight_color = cons.clr_green if ctrl_hands.focus(self) else self.frame_clr
+        frame_highlight_color = cons.clr_green if hands.focus(self) else self.frame_clr
         # Draw button frame
         cv2.rectangle(frame, 
                         (self.x, self.y), 
