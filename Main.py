@@ -5,21 +5,22 @@ import Extensions as extn
 from Controller.ControllerMain import ControllerMain
 import Controller.ControllerHands as hands
 import Controller.ControllerDetector as detector
-# from Router import Router as router
+# import Router as router
 
 def main():
     detector.init()
     # Setup main controller
     ctrl_main = ControllerMain()
+    # Setup video from the camera
+    cap = extn.setup_video()
     # Get frame from the camera
-    while ctrl_main.view.cap.isOpened():
-        success, frame = ctrl_main.view.cap.read()
+    while cap.isOpened():
+        success, frame = cap.read()
         if success:
             # Preprocess frame
             frame = extn.preprocess(frame)
             # Detect pose landmarks and segmentation mask
             detector.analyze_user(frame)
-
             # Set hands coordinates for remote controll
             hands.set()
 
@@ -37,7 +38,7 @@ def main():
             # Show frame
             cv2.imshow(cons.name_app, ctrl_main.view.frame)
             # Handle quit from the app when user tap on keyboard
-            if ctrl_main.is_quit(): break
+            if extn.is_quit(): break
 
         else:
             logging.debug('Cant read frame from the camera -> cap.read()')

@@ -12,10 +12,6 @@ class ViewMain:
         self.frame = []
         self.width = cons.window_width
         self.height = cons.window_height
-        # Setup video from camera
-        self.cap = cv2.VideoCapture(cons.camera_id)
-        self.set_window_size()
-        cv2.namedWindow(cons.name_app, cv2.WINDOW_NORMAL)
         # Setup yoga button
         bttn_width = int(cons.vw_bttn_width * self.width)
         bttn_height = int(cons.vw_bttn_height * self.height)
@@ -32,8 +28,6 @@ class ViewMain:
                                     label=ViewLabel(text=cons.lbl_workout),
                                     center_label=True)
 
-
-        
         # self.point_radius_inner = cons.vw_train_circle_filled_rad
         # self.point_radius = cons.vw_train_circle_rad
         
@@ -41,10 +35,6 @@ class ViewMain:
         # bg_video_name = os.path.join(os.path.dirname(__file__), 'pose_1' + cons.format_video)
         # self.cap_backgrd = cv2.VideoCapture(bg_video_name)
         # self.set_window_size()
-
-    def set_window_size(self):
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height) 
 
     def appear(self):
         if self.draw:
@@ -54,8 +44,6 @@ class ViewMain:
 
     def disappear(self):
         self.draw = False
-
-
 
 # def draw_point(self, img, x, y, clr=cons.clr_red):
 #     cv2.circle(img, (x, y), self.point_radius_inner, clr, cv2.FILLED)
