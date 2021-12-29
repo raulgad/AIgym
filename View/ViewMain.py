@@ -7,7 +7,7 @@ class ViewMain:
     """
     Responsible for drawing main view
     """
-    def __init__(self, ctrl_hands):
+    def __init__(self):
         self.draw = True
         self.frame = []
         self.window_width = cons.window_width
@@ -23,16 +23,14 @@ class ViewMain:
                                     x_end=cons.vw_bttn_spacing + bttn_width, 
                                     y_end=cons.vw_bttn_spacing + bttn_height,
                                     label=ViewLabel(text=cons.lbl_yoga),
-                                    center_label=True,
-                                    ctrl_hands=ctrl_hands)
+                                    center_label=True)
         # Setup workout button
         self.bttn_workout = ViewButton(x=self.window_width - (cons.vw_bttn_spacing + bttn_width), 
                                     y=cons.vw_bttn_spacing,
                                     x_end=self.window_width - cons.vw_bttn_spacing, 
                                     y_end=cons.vw_bttn_spacing + bttn_height,
                                     label=ViewLabel(text=cons.lbl_workout),
-                                    center_label=True,
-                                    ctrl_hands=ctrl_hands)
+                                    center_label=True)
 
 
         

@@ -1,6 +1,7 @@
 import cv2
 import Constants as cons
 import View.ViewLabel as ViewLabel
+import Controller.ControllerHands as ctrl_hands
 
 class ViewButton:
     """
@@ -9,7 +10,6 @@ class ViewButton:
     def __init__(self, 
                 x, y, 
                 x_end, y_end,
-                ctrl_hands,
                 filled_divider=1, 
                 frame_thick=cons.vw_bttn_frame_thick, 
                 frame_clr=cons.clr_black, 
@@ -21,7 +21,6 @@ class ViewButton:
         self.y = y
         self.x_end = x_end
         self.y_end = y_end
-        self.ctrl_hands = ctrl_hands
         self.width = self.x_end - self.x
         self.height = self.y_end - self.y
         self.fill_step = self.width / filled_divider
@@ -37,7 +36,7 @@ class ViewButton:
 
     def draw(self, frame):
         # Highlight button if hand in its area
-        frame_highlight_color = cons.clr_green if self.ctrl_hands.focus(self) else self.frame_clr
+        frame_highlight_color = cons.clr_green if ctrl_hands.focus(self) else self.frame_clr
         # Draw button frame
         cv2.rectangle(frame, 
                         (self.x, self.y), 
