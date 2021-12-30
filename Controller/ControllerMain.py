@@ -8,11 +8,13 @@ class ControllerMain(Controller):
     def __init__(self):
         super().__init__()
         self.view = ViewMain()
+        self.view.bttn_yoga.action = self.tap_yoga
+        self.view.bttn_workout.action = self.tap_workout
 
-    # def main(self):
-    #     if self.ctrl_hands.tapped(self.view.bttn_yoga):
-    #         pass
-    #     elif self.ctrl_hands.tapped(self.view.bttn_workout):
-    #         pass
-    
+    def tap_yoga(self):
+        print("tap_yoga")
+
+    def tap_workout(self):
+        print("tap_workout")
+
 

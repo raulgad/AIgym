@@ -9,6 +9,9 @@ class ViewButton(View):
     """
     Responsible for button drawing
     """
+    # Class variable for activate only one button at time
+    has_focused = False
+
     def __init__(self, 
                 x, y,
                 x_end, y_end,
@@ -17,6 +20,7 @@ class ViewButton(View):
                 frame_clr=cons.clr_black, 
                 backgr_clr=cons.clr_black,
                 label=ViewLabel,
+                action=None,
                 center_label=False,
                 ) -> None:
         super().__init__()
@@ -32,20 +36,26 @@ class ViewButton(View):
         self.frame_thick = frame_thick
         self.backgr_clr = backgr_clr
         self.label = label
+        self.action = action
         # Centerize label if needed
         if center_label:
             self.label.x = int(self.x + self.width / 2 - self.label.width / 2)
             self.label.y = int(self.y + self.height / 2 + self.label.height / 2)
 
     def appear(self, frame):
-        super().appear(frame)
         if self.is_draw:
             # Deactivate button (not highlighted and tappable) if it isnt on the main screen
             if not router.shown(self): self.is_active = False
+            super().appear(frame)
 
+        # if self.action:
+        #     self.action()
+            
     def draw(self):
         # Highlight button if hand in its area
-        frame_highlight_color = cons.clr_green if hands.focus(self) and self.is_active else self.frame_clr
+        focused = hands.focus(self)
+        frame_highlight_color = cons.clr_green if focused and self.is_active and not ViewButton.has_focused else self.frame_clr
+        ViewButton.has_focused = focused
         # Draw button frame
         cv2.rectangle(self.frame,
                         (self.x, self.y), 
@@ -60,7 +70,7 @@ class ViewButton(View):
                         (self.x_end, self.y_end), 
                         filled_clr, 
                         cv2.FILLED)
-        # Draw button filled part
+        # Draw button's partially filled part
         if self.fill_step > 0 and self.fill_step < self.width:
             cv2.rectangle(self.frame, 
                             (self.x, self.y), 
@@ -76,4 +86,3 @@ class ViewButton(View):
                         self.label.scale, 
                         self.label.color, 
                         self.label.thick)
-                        
