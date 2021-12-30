@@ -9,8 +9,8 @@ import Router as router
 
 def main():
     detector.init()
-    # Setup root view controller
     root = ControllerMain()
+    router.root = root
     # Setup video from the camera
     cap = extn.setup_video()
     # Get frame from the camera
@@ -23,13 +23,10 @@ def main():
             detector.analyze_user(frame)
             # Set hands coordinates for remote controll
             hands.set()
-
             # Show main view
             root.view.appear(frame)
-            # SHow modal view
+            # Show modal view
             if root.modal: root.modal.view.appear(frame)
-
-            # router.segue(ctrl_main.view)
 
             # Handle if user tap on yoga or workout button
             # ctrl_main.main()

@@ -1,3 +1,5 @@
+from View.View import View
+
 class Controller:
     """
     Responsible for logic of all controllers

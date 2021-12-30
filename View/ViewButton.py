@@ -3,6 +3,7 @@ import Constants as cons
 import View.ViewLabel as ViewLabel
 import Controller.Hands as hands
 from View.View import View
+import Router as router
 
 class ViewButton(View):
     """
@@ -19,6 +20,7 @@ class ViewButton(View):
                 center_label=False,
                 ) -> None:
         super().__init__()
+        self.is_active = True
         self.x = x
         self.y = y
         self.x_end = x_end
@@ -35,9 +37,15 @@ class ViewButton(View):
             self.label.x = int(self.x + self.width / 2 - self.label.width / 2)
             self.label.y = int(self.y + self.height / 2 + self.label.height / 2)
 
+    def appear(self, frame):
+        super().appear(frame)
+        if self.is_draw:
+            # Deactivate button (not highlighted and tappable) if it isnt on the main screen
+            if not router.shown(self): self.is_active = False
+
     def draw(self):
         # Highlight button if hand in its area
-        frame_highlight_color = cons.clr_green if hands.focus(self) else self.frame_clr
+        frame_highlight_color = cons.clr_green if hands.focus(self) and self.is_active else self.frame_clr
         # Draw button frame
         cv2.rectangle(self.frame,
                         (self.x, self.y), 
@@ -68,4 +76,4 @@ class ViewButton(View):
                         self.label.scale, 
                         self.label.color, 
                         self.label.thick)
-
+                        
