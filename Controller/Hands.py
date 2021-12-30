@@ -1,5 +1,5 @@
 import Constants as cons
-import Controller.ControllerDetector as detector
+import Controller.Detector as detector
 
 """
 Responsible for logic of remote hands controll

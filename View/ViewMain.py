@@ -1,15 +1,14 @@
 import Constants as cons
-import cv2
 from View.ViewButton import ViewButton
 from View.ViewLabel import ViewLabel
+from View.View import View
 
-class ViewMain:
+class ViewMain(View):
     """
     Responsible for drawing main view
     """
     def __init__(self):
-        self.draw = True
-        self.frame = []
+        super().__init__()
         self.width = cons.window_width
         self.height = cons.window_height
         # Setup yoga button
@@ -27,23 +26,18 @@ class ViewMain:
                                     y_end=cons.vw_bttn_spacing + bttn_height,
                                     label=ViewLabel(text=cons.lbl_workout),
                                     center_label=True)
+        self.add_subview(self.bttn_yoga)
+        self.add_subview(self.bttn_workout)
 
-        # self.point_radius_inner = cons.vw_train_circle_filled_rad
-        # self.point_radius = cons.vw_train_circle_rad
-        
-        # # Setup background video 
-        # bg_video_name = os.path.join(os.path.dirname(__file__), 'pose_1' + cons.format_video)
-        # self.cap_backgrd = cv2.VideoCapture(bg_video_name)
-        # self.set_window_size()
 
-    def appear(self):
-        if self.draw:
-            # Draw main buttons
-            self.bttn_yoga.draw(self.frame)
-            self.bttn_workout.draw(self.frame)
+    # self.point_radius_inner = cons.vw_train_circle_filled_rad
+    # self.point_radius = cons.vw_train_circle_rad
+    
+    # # Setup background video 
+    # bg_video_name = os.path.join(os.path.dirname(__file__), 'pose_1' + cons.format_video)
+    # self.cap_backgrd = cv2.VideoCapture(bg_video_name)
+    # self.set_window_size()
 
-    def disappear(self):
-        self.draw = False
 
 # def draw_point(self, img, x, y, clr=cons.clr_red):
 #     cv2.circle(img, (x, y), self.point_radius_inner, clr, cv2.FILLED)

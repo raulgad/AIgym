@@ -3,14 +3,14 @@ import cv2
 import Constants as cons
 import Extensions as extn
 from Controller.ControllerMain import ControllerMain
-import Controller.ControllerHands as hands
-import Controller.ControllerDetector as detector
-# import Router as router
+import Controller.Hands as hands
+import Controller.Detector as detector
+import Router as router
 
 def main():
     detector.init()
-    # Setup main controller
-    ctrl_main = ControllerMain()
+    # Setup root view controller
+    root = ControllerMain()
     # Setup video from the camera
     cap = extn.setup_video()
     # Get frame from the camera
@@ -25,18 +25,19 @@ def main():
             hands.set()
 
             # Show main view
-            ctrl_main.view.frame = frame
-            ctrl_main.view.appear()
+            root.view.appear(frame)
+            # SHow modal view
+            if root.modal: root.modal.view.appear(frame)
 
             # router.segue(ctrl_main.view)
 
             # Handle if user tap on yoga or workout button
             # ctrl_main.main()
 
-            extn.draw_fps(ctrl_main.view.frame)
+            extn.draw_fps(root.view.frame)
 
             # Show frame
-            cv2.imshow(cons.name_app, ctrl_main.view.frame)
+            cv2.imshow(cons.name_app, root.view.frame)
             # Handle quit from the app when user tap on keyboard
             if extn.is_quit(): break
 

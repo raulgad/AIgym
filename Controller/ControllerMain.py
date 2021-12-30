@@ -1,13 +1,12 @@
-import logging
-import cv2
-import Constants as cons
 from View.ViewMain import ViewMain
+from Controller.Controller import Controller
 
-class ControllerMain:
+class ControllerMain(Controller):
     """
     Responsible for the main logic
     """
     def __init__(self):
+        super().__init__()
         self.view = ViewMain()
 
     # def main(self):

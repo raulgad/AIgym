@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import time
-from Controller.ControllerHands import ControllerHands
+from Controller.Hands import ControllerHands
 import PoseModule as pm
 import os
 import Constants as cons

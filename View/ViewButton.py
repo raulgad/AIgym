@@ -1,9 +1,10 @@
 import cv2
 import Constants as cons
 import View.ViewLabel as ViewLabel
-import Controller.ControllerHands as hands
+import Controller.Hands as hands
+from View.View import View
 
-class ViewButton:
+class ViewButton(View):
     """
     Responsible for button drawing
     """
@@ -17,6 +18,7 @@ class ViewButton:
                 label=ViewLabel,
                 center_label=False,
                 ) -> None:
+        super().__init__()
         self.x = x
         self.y = y
         self.x_end = x_end
@@ -33,12 +35,11 @@ class ViewButton:
             self.label.x = int(self.x + self.width / 2 - self.label.width / 2)
             self.label.y = int(self.y + self.height / 2 + self.label.height / 2)
 
-
-    def draw(self, frame):
+    def draw(self):
         # Highlight button if hand in its area
         frame_highlight_color = cons.clr_green if hands.focus(self) else self.frame_clr
         # Draw button frame
-        cv2.rectangle(frame, 
+        cv2.rectangle(self.frame,
                         (self.x, self.y), 
                         (self.x_end, self.y_end), 
                         frame_highlight_color, 
@@ -46,21 +47,21 @@ class ViewButton:
         # Draw button background. 
         # Button is filled if its frame color is equal the background color.
         filled_clr = self.frame_clr if self.backgr_clr == self.frame_clr else self.backgr_clr
-        cv2.rectangle(frame, 
+        cv2.rectangle(self.frame, 
                         (self.x, self.y), 
                         (self.x_end, self.y_end), 
                         filled_clr, 
                         cv2.FILLED)
         # Draw button filled part
         if self.fill_step > 0 and self.fill_step < self.width:
-            cv2.rectangle(frame, 
+            cv2.rectangle(self.frame, 
                             (self.x, self.y), 
                             (self.x_end + self.fill_step, self.y_end), 
                             self.frame_clr, 
                             cv2.FILLED)
         # Draw button label
         if self.label:
-            cv2.putText(frame, 
+            cv2.putText(self.frame, 
                         self.label.text, 
                         (self.label.x, self.label.y), 
                         self.label.font, 
