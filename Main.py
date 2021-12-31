@@ -9,8 +9,7 @@ import Router as router
 
 def main():
     detector.init()
-    root = ControllerMain()
-    router.root = root
+    router.root = ControllerMain()
     # Setup video from the camera
     cap = extn.setup_video()
     # Get frame from the camera
@@ -24,18 +23,17 @@ def main():
             # Set hands coordinates for remote controll
             hands.set()
             # Show main view
-            root.view.appear(frame)
+            router.root.view.appear(frame)
             # Show modal view
-            if root.modal: root.modal.view.appear(frame)
+            if router.root.modal: router.root.modal.view.appear(router.root.view.frame)
+            # Render frame
+            try:
+                extn.draw_fps(router.root.view.frame)
 
-            # Handle if user tap on yoga or workout button
-            # ctrl_main.main()
-
-            extn.draw_fps(root.view.frame)
-
-            # Show frame
-            cv2.imshow(cons.name_app, root.view.frame)
-            # Handle quit from the app when user tap on keyboard
+                cv2.imshow(cons.name_app, router.root.view.frame)
+            except:
+                logging.debug('Cant render the frame -> cv2.imshow()')
+            # Quit from the app when user tap on keyboard
             if extn.is_quit(): break
 
         else:

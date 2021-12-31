@@ -1,5 +1,3 @@
-from Controller.Controller import Controller
-
 """
 Responsible for route between controllers
 """
@@ -11,8 +9,8 @@ def segue(fr, to, modal=False):
     # Close modal view if we go back to its main view or segue is not modal
     if not modal or fr == root.modal:
         root.modal = None
-        # Remove last controller from the stack (controllers) if we segue back
-        if fr == controllers[-1] and to == controllers[-2]:
+        # Remove last controller from the controller's stack if we segue back
+        if len(controllers) >= 2 and fr == controllers[-1] and to == controllers[-2]:
             controllers.pop()
         # Add new controller to the stack
         else:
@@ -24,6 +22,7 @@ def segue(fr, to, modal=False):
         root.modal = to
 
 def shown(view):
+    global root
     # Get main view of the controller
     main_view = view.super if view.super else view
     # Return if view is shown as a main view on the screen

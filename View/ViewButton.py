@@ -53,6 +53,8 @@ class ViewButton(View):
             super().appear(frame)
             # Handle tapping on the button
             if self.tapped() and self.action: self.action()
+            # Set the one of the buttons is now focused
+            ViewButton.one_active = self.is_focused
             
     def draw(self):
         self.is_focused = hands.focus(self)
@@ -101,9 +103,6 @@ class ViewButton(View):
                 self.time_start_focus = 0
                 self.is_tapped = True
                 return True
-            # Set the one of the buttons is now focused
-            ViewButton.one_active = True
         else:
             self.time_start_focus = 0
             self.is_tapped = False
-            ViewButton.one_active = False
