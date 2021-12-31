@@ -1,3 +1,4 @@
+import logging
 import Constants as cons
 import Controller.Detector as detector
 
@@ -10,8 +11,13 @@ def set():
     # Set current coordinates of left (l) and right (r) hands
     global l_x, l_y, r_x, r_y
     if detector.lmks:
-        l_x, l_y, _ = detector.lmks[cons.RIGHT_INDEX]
-        r_x, r_y, _ = detector.lmks[cons.LEFT_INDEX]
+        try:
+            l_x, l_y, _ = detector.lmks[cons.RIGHT_INDEX]
+            r_x, r_y, _ = detector.lmks[cons.LEFT_INDEX]
+        except:
+            logging.debug('Cant set hands coordinates in set() -> Hands')
+            pass
+        
 
 def point_between(point, between):
     return point > between[0] and point < (between[0] + between[1])
