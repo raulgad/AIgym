@@ -1,5 +1,7 @@
 from View.ViewTrain import ViewTrain
 from Controller.Controller import Controller
+from Controller.ControllerModalPause import ControllerModalPause
+import Router as router
 
 class ControllerTrain(Controller):
     """
@@ -15,6 +17,8 @@ class ControllerTrain(Controller):
 
     def tap_pause(self):
         print("tap_pause")
+        router.segue(fr=self, to=ControllerModalPause(), modal=True)
 
     def tap_next(self):
         print("tap_next")
+        

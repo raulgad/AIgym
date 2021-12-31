@@ -28,6 +28,7 @@ def main():
             if router.root.modal: router.root.modal.view.appear(router.root.view.frame)
             # Render frame
             try:
+                
                 extn.draw_fps(router.root.view.frame)
 
                 cv2.imshow(cons.name_app, router.root.view.frame)

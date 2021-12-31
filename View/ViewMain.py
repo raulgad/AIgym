@@ -1,7 +1,5 @@
 import Constants as cons
 import Extensions as extn
-from View.ViewButton import ViewButton
-from View.ViewLabel import ViewLabel
 from View.View import View
 
 class ViewMain(View):

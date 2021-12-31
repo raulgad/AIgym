@@ -1,10 +1,10 @@
 """
-Responsible for route between controllers
+Responsible for route between screens
 """
 root = None
 controllers = []
 
-def segue(fr, to, modal=False):
+def segue(fr, to=None, modal=False):
     global root
     # Close modal view if we go back to its main view or segue is not modal
     if not modal or fr == root.modal:
@@ -13,12 +13,12 @@ def segue(fr, to, modal=False):
         if len(controllers) >= 2 and fr == controllers[-1] and to == controllers[-2]:
             controllers.pop()
         # Add new controller to the stack
-        else:
+        elif to:
             controllers.append(to)
         # Show new controller
         root = controllers[-1]
     # Show new modal controller 
-    else:
+    elif to:
         root.modal = to
 
 def shown(view):

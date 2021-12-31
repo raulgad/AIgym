@@ -36,13 +36,11 @@ def is_quit():
 
 # Layout button on the corner of the screen
 def layout_corner_bttn(left=True, top=True, label="", center_label=True, backgr_clr=cons.clr_black):
-    bttn_width = int(cons.vw_bttn_width * cons.window_width)
-    bttn_height = int(cons.vw_bttn_height * cons.window_height)
     # Determine if button on the top or bottom and on left or right sides
-    x = cons.vw_bttn_spacing if left else (cons.window_width - (cons.vw_bttn_spacing + bttn_width))
-    x_end = (cons.vw_bttn_spacing + bttn_width) if left else (cons.window_width - cons.vw_bttn_spacing)
-    y = cons.vw_bttn_spacing if top else (cons.window_height - bttn_height - cons.vw_bttn_spacing)
-    y_end= cons.vw_bttn_spacing + bttn_height if top else (cons.window_height - cons.vw_bttn_spacing)
+    x = cons.vw_bttn_spacing if left else (cons.window_width - (cons.vw_bttn_spacing + cons.vw_bttn_width))
+    x_end = (cons.vw_bttn_spacing + cons.vw_bttn_width) if left else (cons.window_width - cons.vw_bttn_spacing)
+    y = cons.vw_bttn_spacing if top else (cons.window_height - cons.vw_bttn_height - cons.vw_bttn_spacing)
+    y_end= cons.vw_bttn_spacing + cons.vw_bttn_height if top else (cons.window_height - cons.vw_bttn_spacing)
     return ViewButton(x=x, y=y, x_end=x_end, y_end=y_end, 
                     label=ViewLabel(text=label), 
                     center_label=center_label, backgr_clr=backgr_clr)

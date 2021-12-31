@@ -102,8 +102,8 @@ num_big = 1000000000000
 vw_train_circle_rad = 10
 vw_train_circle_filled_rad = 5
 vw_bttn_spacing = 10
-vw_bttn_width = 0.3
-vw_bttn_height = 0.185
+vw_bttn_width = int(0.3 * window_width)
+vw_bttn_height = int(0.185 * window_height)
 vw_bttn_frame_thick = 6
 
 # Angles

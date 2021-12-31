@@ -41,24 +41,24 @@ class ViewButton(View):
         self.backgr_clr = backgr_clr
         self.label = label
         self.action = action
-        # Centerize label if needed
-        if center_label:
-            self.label.x = int(self.x + self.width / 2 - self.label.width / 2)
-            self.label.y = int(self.y + self.height / 2 + self.label.height / 2)
+        # Centerize label.x if needed
+        self.label.x = int(self.x + self.width / 2 - self.label.width / 2) if center_label else self.x + cons.vw_bttn_spacing
+        self.label.y = int(self.y + self.height / 2 + self.label.height / 2)
 
     def appear(self, frame):
         if self.is_draw:
-            # Deactivate button (not highlighted and tappable) if it isnt on the main screen
-            if not router.shown(self): self.is_active = False
+            # Deactivate button (not highlighted and tappable) if it isnt on the main screen, 
+            # eg when modal view is shown
+            self.is_active = router.shown(self)
             super().appear(frame)
             # Handle tapping on the button
-            if self.tapped() and self.action: self.action()
+            if self.is_active and self.action and self.tapped(): self.action()
             # Set the one of the buttons is now focused
             ViewButton.one_active = self.is_focused
             
     def draw(self):
         self.is_focused = hands.focus(self)
-        # Highlight button if hand in its area
+        # Highlight button if it focused
         frame_highlight_color = cons.clr_green if self.is_focused and self.is_active and not ViewButton.one_active else self.frame_clr
         # Draw button frame
         cv2.rectangle(self.frame,
@@ -67,7 +67,7 @@ class ViewButton(View):
                         frame_highlight_color, 
                         self.frame_thick)
         # Draw button background. 
-        # Button is filled if its frame color is equal the background color.
+        # Button is filled if its frame color is equal the background color
         filled_clr = self.frame_clr if self.backgr_clr == self.frame_clr else self.backgr_clr
         cv2.rectangle(self.frame, 
                         (self.x, self.y), 

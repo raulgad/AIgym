@@ -1,8 +1,6 @@
 import os
 import cv2
 import Constants as cons
-from View.ViewButton import ViewButton
-from View.ViewLabel import ViewLabel
 from View.View import View
 import Controller.Detector as detector
 import Extensions as extn
@@ -19,7 +17,7 @@ class ViewTrain(View):
         bg_video_name = os.path.join(os.path.dirname(__file__), 'pose_1' + cons.format_video)
         self.cap_backgrd = extn.setup_video(bg_video_name)
         # Layout pause and next buttons
-        self.bttn_pause = extn.layout_corner_bttn(label=cons.lbl_pause, backgr_clr=cons.clr_gray)
+        self.bttn_pause = extn.layout_corner_bttn(label=cons.lbl_pause, center_label=False, backgr_clr=cons.clr_gray)
         self.bttn_next = extn.layout_corner_bttn(left=False, label=cons.lbl_next, backgr_clr=cons.clr_gray)
         self.add_subview(self.bttn_pause)
         self.add_subview(self.bttn_next)
