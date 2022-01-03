@@ -21,5 +21,3 @@ class ControllerMain(Controller):
 
     def tap_workout(self):
         router.segue(fr=self, to=ControllerWorkout())
-
-

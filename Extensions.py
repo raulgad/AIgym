@@ -43,4 +43,10 @@ def layout_corner_bttn(left=True, top=True, label="", center_label=True, backgr_
                     label=ViewLabel(text=label), 
                     center_label=center_label, backgr_clr=backgr_clr)
 
-
+# Time ticker
+prev_time = 0
+def timeticker(tm=5, value=1):
+    global prev_time
+    if time.localtime(time.time() - prev_time)[tm] >= value:
+        prev_time = time.time()
+        return True

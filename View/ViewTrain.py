@@ -42,11 +42,13 @@ class ViewTrain(View):
                 # Repeat video if it's end
                 if not success:
                     self.ctrl.cap_backgrd.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                    _, self.backgrd_frame = self.ctrl.cap_backgrd.read()
                 # Add background frame to segmented user's frame
-                else:
-                    self.add_background()
-                    # Show frame with background video under the train's subviews
-                    super().appear(self.frame)
+                self.add_background()
+                # Show frame with background video under the train's subviews
+                super().appear(self.frame)
+            # Give runtime to the parent controller
+            self.ctrl.run()
 
     def draw_point(self, x, y, clr=cons.clr_red):
         cv2.circle(self.frame, (x, y), cons.vw_train_circle_filled_rad, clr, cv2.FILLED)

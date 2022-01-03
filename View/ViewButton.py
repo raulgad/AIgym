@@ -16,7 +16,6 @@ class ViewButton(View):
     def __init__(self, 
                 x, y,
                 x_end, y_end,
-                filled_divider=1, 
                 frame_thick=cons.vw_bttn_frame_thick, 
                 frame_clr=cons.clr_black, 
                 backgr_clr=cons.clr_black,
@@ -35,7 +34,7 @@ class ViewButton(View):
         self.y_end = y_end
         self.width = self.x_end - self.x
         self.height = self.y_end - self.y
-        self.fill_step = self.width / filled_divider
+        self.filled_width = 0
         self.frame_clr = frame_clr
         self.frame_thick = frame_thick
         self.backgr_clr = backgr_clr
@@ -75,12 +74,15 @@ class ViewButton(View):
                         filled_clr, 
                         cv2.FILLED)
         # Draw button's partially filled part
-        if self.fill_step > 0 and self.fill_step < self.width:
+        if self.filled_width > 0:
             cv2.rectangle(self.frame, 
                             (self.x, self.y), 
-                            (self.x_end + self.fill_step, self.y_end), 
+                            (self.x + self.filled_width, self.y_end), 
                             self.frame_clr, 
                             cv2.FILLED)
+        # Full fill background if filled part goes beyond width
+        elif self.filled_width >= self.width:
+            self.filled_width = self.width
         # Draw button label
         if self.label:
             cv2.putText(self.frame, 
@@ -97,7 +99,7 @@ class ViewButton(View):
             # Reinit 'time_start_focus' when user start focus the button
             if not self.time_start_focus:
                 self.time_start_focus = time.time()
-            # Check if user hand is focused on button certain time
+            # Check if user hand is focused certain time on the button 
             time_in_focus = int(time.time() - self.time_start_focus)
             if time_in_focus == cons.time_tap and not self.is_tapped:
                 self.time_start_focus = 0
