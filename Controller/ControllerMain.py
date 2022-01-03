@@ -1,7 +1,7 @@
-import logging
 from View.ViewMain import ViewMain
 from Controller.Controller import Controller
-from Controller.ControllerTrain import ControllerTrain
+from Controller.ControllerYoga import ControllerYoga
+from Controller.ControllerWorkout import ControllerWorkout
 import Router as router
 
 class ControllerMain(Controller):
@@ -17,10 +17,9 @@ class ControllerMain(Controller):
         self.view.bttn_workout.action = self.tap_workout
 
     def tap_yoga(self):
-        logging.debug('tap_yoga')
-        router.segue(fr=self, to=ControllerTrain())
+        router.segue(fr=self, to=ControllerYoga())
 
     def tap_workout(self):
-        logging.debug('tap_workout')
+        router.segue(fr=self, to=ControllerWorkout())
 
 

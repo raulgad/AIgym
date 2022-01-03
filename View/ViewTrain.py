@@ -17,7 +17,7 @@ class ViewTrain(View):
         self.ctrl = ctrl
         self.backgrd_frame = None
         self.paused_backgrd_frame = None
-        self.paused_frame_id = None
+        self.paused_frame_idx = None
         # Layout pause and next buttons
         self.bttn_pause = extn.layout_corner_bttn(label=cons.lbl_pause, center_label=False, backgr_clr=cons.clr_gray)
         self.bttn_next = extn.layout_corner_bttn(left=False, label=cons.lbl_next, backgr_clr=cons.clr_gray)
@@ -63,19 +63,17 @@ class ViewTrain(View):
                 cv2.line(self.frame, (x1, y1), (x2, y2), clr, cons.fnt_thick)
                 self.draw_point(self.frame, x2, y2, clr=point_clr)
 
+    def add_background(self):
+        # Add background frame to segmented user's frame
+        condition = np.stack((detector.segmentation_mask,) * 3, axis=-1) > 0.1
+        self.frame = np.where(condition, self.frame, np.array(self.backgrd_frame).astype(np.uint8))
+
     def pause_background(self, pause=True):
         if pause:
             # Save paused frame
             self.paused_backgrd_frame = self.backgrd_frame
-            # Save paused frame index
-            self.paused_frame_id = self.ctrl.cap_backgrd.get(cv2.CAP_PROP_POS_FRAMES)
+            self.paused_frame_idx = self.ctrl.cap_backgrd.get(cv2.CAP_PROP_POS_FRAMES)
         else:
             self.paused_backgrd_frame = None
             # Start video from paused state
-            self.ctrl.cap_backgrd.set(cv2.CAP_PROP_POS_FRAMES, self.paused_frame_id)
-
-
-    def add_background(self):
-        # Add background frame to segmented user frame
-        condition = np.stack((detector.segmentation_mask,) * 3, axis=-1) > 0.1
-        self.frame = np.where(condition, self.frame, np.array(self.backgrd_frame).astype(np.uint8))
+            self.ctrl.cap_backgrd.set(cv2.CAP_PROP_POS_FRAMES, self.paused_frame_idx)
