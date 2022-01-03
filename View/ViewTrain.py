@@ -17,6 +17,7 @@ class ViewTrain(View):
         self.ctrl = ctrl
         self.backgrd_frame = None
         self.paused_backgrd_frame = None
+        self.paused_frame_id = None
         # Layout pause and next buttons
         self.bttn_pause = extn.layout_corner_bttn(label=cons.lbl_pause, center_label=False, backgr_clr=cons.clr_gray)
         self.bttn_next = extn.layout_corner_bttn(left=False, label=cons.lbl_next, backgr_clr=cons.clr_gray)
@@ -36,14 +37,15 @@ class ViewTrain(View):
             if self.ctrl.cap_backgrd and detector.segmentation_mask is not None:
                 success, self.backgrd_frame = self.ctrl.cap_backgrd.read()
                 # Set paused background frame if we in paused state
-                if self.paused_backgrd_frame: self.backgrd_frame = self.paused_backgrd_frame
+                if self.paused_backgrd_frame is not None: 
+                    self.backgrd_frame = self.paused_backgrd_frame
                 # Repeat video if it's end
                 if not success:
                     self.ctrl.cap_backgrd.set(cv2.CAP_PROP_POS_FRAMES, 0)
                 # Add background frame to segmented user's frame
                 else:
                     self.add_background()
-                    # Show changed 'self.frame' with background video under the subviews
+                    # Show frame with background video under the train's subviews
                     super().appear(self.frame)
 
     def draw_point(self, x, y, clr=cons.clr_red):
@@ -60,6 +62,18 @@ class ViewTrain(View):
                 x2, y2, _ = detector.lmks[points[p_idx + 1]]
                 cv2.line(self.frame, (x1, y1), (x2, y2), clr, cons.fnt_thick)
                 self.draw_point(self.frame, x2, y2, clr=point_clr)
+
+    def pause_background(self, pause=True):
+        if pause:
+            # Save paused frame
+            self.paused_backgrd_frame = self.backgrd_frame
+            # Save paused frame index
+            self.paused_frame_id = self.ctrl.cap_backgrd.get(cv2.CAP_PROP_POS_FRAMES)
+        else:
+            self.paused_backgrd_frame = None
+            # Start video from paused state
+            self.ctrl.cap_backgrd.set(cv2.CAP_PROP_POS_FRAMES, self.paused_frame_id)
+
 
     def add_background(self):
         # Add background frame to segmented user frame

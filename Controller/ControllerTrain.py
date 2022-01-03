@@ -18,13 +18,14 @@ class ControllerTrain(Controller):
         self.view = ViewTrain(ctrl=self)
         # Set callbacks to train buttons actions
         self.view.bttn_pause.action = self.tap_pause
-        self.view.bttn_next.action = self.tap_next
 
-        self.set_backgrd_video(cons.dir_yoga, 't')
+        # self.view.bttn_next.action = self.tap_next
+        self.cap_backgrd = extn.setup_video(cons.dir_yoga, 't')
 
     def tap_pause(self):
         logging.debug('tap_pause')
-        router.segue(fr=self, to=ControllerModalPause(), modal=True)
+        self.view.pause_background()
+        router.segue(fr=self, to=ControllerModalPause(super_ctrl=self), modal=True)
 
     # def tap_next(self):
     #     logging.debug('tap_next')

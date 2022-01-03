@@ -7,8 +7,9 @@ class ControllerModalPause(Controller):
     """
     Responsible for the logic of paused modal view controller
     """
-    def __init__(self):
+    def __init__(self, super_ctrl):
         super().__init__()
+        self.super_ctrl=super_ctrl
         # Layout paused modal view
         self.view = ViewModalPause()
         # Set callbacks to paused modal view buttons actions
@@ -22,5 +23,6 @@ class ControllerModalPause(Controller):
         
     def tap_continue(self):
         # Go back to train screen
+        self.super_ctrl.view.pause_background(False)
         router.segue(fr=self)
         
