@@ -1,26 +1,50 @@
-import os
+import numpy as np
 import cv2
 import Constants as cons
-from View.View import View
-import Controller.Detector as detector
 import Extensions as extn
+import Controller.Detector as detector
+from View.View import View
+from View.ViewLabel import ViewLabel
 
 class ViewTrain(View):
     """
     Responsible for drawing train view
     """
-    def __init__(self):
+    def __init__(self, ctrl):
         super().__init__()
         self.width = cons.window_width
         self.height = cons.window_height
-        # Setup background video 
-        bg_video_name = os.path.join(os.path.dirname(__file__), 'pose_1' + cons.format_video)
-        self.cap_backgrd = extn.setup_video(bg_video_name)
+        self.ctrl = ctrl
+        self.backgrd_frame = None
+        self.paused_backgrd_frame = None
         # Layout pause and next buttons
         self.bttn_pause = extn.layout_corner_bttn(label=cons.lbl_pause, center_label=False, backgr_clr=cons.clr_gray)
         self.bttn_next = extn.layout_corner_bttn(left=False, label=cons.lbl_next, backgr_clr=cons.clr_gray)
         self.add_subview(self.bttn_pause)
         self.add_subview(self.bttn_next)
+        # Layout pose label
+        self.pose_label = ViewLabel(color=cons.clr_red, text=cons.lbl_correct_limbs)
+        self.pose_label.y = self.bttn_pause.label.y
+        # Horizontally centerize pose label
+        self.pose_label.x = int(self.width / 2 - self.pose_label.width / 2)
+        self.add_subview(self.pose_label)
+
+    def appear(self, frame):
+        if self.is_draw:
+            self.frame = frame
+            # Read background video frame
+            if self.ctrl.cap_backgrd and detector.segmentation_mask is not None:
+                success, self.backgrd_frame = self.ctrl.cap_backgrd.read()
+                # Set paused background frame if we in paused state
+                if self.paused_backgrd_frame: self.backgrd_frame = self.paused_backgrd_frame
+                # Repeat video if it's end
+                if not success:
+                    self.ctrl.cap_backgrd.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                # Add background frame to segmented user's frame
+                else:
+                    self.add_background()
+                    # Show changed 'self.frame' with background video under the subviews
+                    super().appear(self.frame)
 
     def draw_point(self, x, y, clr=cons.clr_red):
         cv2.circle(self.frame, (x, y), cons.vw_train_circle_filled_rad, clr, cv2.FILLED)
@@ -36,3 +60,8 @@ class ViewTrain(View):
                 x2, y2, _ = detector.lmks[points[p_idx + 1]]
                 cv2.line(self.frame, (x1, y1), (x2, y2), clr, cons.fnt_thick)
                 self.draw_point(self.frame, x2, y2, clr=point_clr)
+
+    def add_background(self):
+        # Add background frame to segmented user frame
+        condition = np.stack((detector.segmentation_mask,) * 3, axis=-1) > 0.1
+        self.frame = np.where(condition, self.frame, np.array(self.backgrd_frame).astype(np.uint8))

@@ -11,9 +11,9 @@ class ViewModalPause(View):
         super().__init__()
         self.width = cons.window_width
         self.height = cons.window_height
-        # Layout exit and continue buttons
+        # Layout exit button
         spacing_between_bttns = cons.vw_bttn_spacing * 6
-        # Centerize buttons horizontally
+        # Horizontally centerize buttons
         x_exit = int(cons.window_width / 2 - (cons.vw_bttn_width + spacing_between_bttns / 2))
         y_exit = int(cons.window_height * 0.4)
         x_exit_end = x_exit + cons.vw_bttn_width

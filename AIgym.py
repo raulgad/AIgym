@@ -172,7 +172,7 @@ while cap.isOpened():
             cv2.putText(img, 
                         top_label, 
                         (400, 75), 
-                        cv2.FONT_HERSHEY_DUPLEX, 
+                        cons.font, 
                         cons.fnt_scale_menu, 
                         label_clr, 
                         cons.fnt_thick)

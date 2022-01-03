@@ -12,6 +12,7 @@ def main():
     router.root = ControllerMain()
     # Setup video from the camera
     cap = extn.setup_video()
+    cv2.namedWindow(cons.name_app, cv2.WINDOW_NORMAL)
     # Get frame from the camera
     while cap.isOpened():
         success, frame = cap.read()

@@ -5,8 +5,6 @@ import Constants as cons
 from View.ViewButton import ViewButton
 from View.ViewLabel import ViewLabel
 
-dirname = os.path.dirname(__file__)
-
 # Draw framerate
 fps_prev_time = 0
 def draw_fps(img):
@@ -14,7 +12,7 @@ def draw_fps(img):
     curr_time = time.time()
     fps = 1 / (curr_time - fps_prev_time)
     fps_prev_time = curr_time
-    cv2.putText(img, str(int(fps)), (50, 500), cv2.FONT_HERSHEY_DUPLEX, cons.fnt_scale_menu, cons.clr_blue, cons.fnt_thick)
+    cv2.putText(img, str(int(fps)), (cons.vw_bttn_spacing, cons.window_height - cons.vw_bttn_spacing), cons.font, cons.fnt_scale_menu, cons.clr_blue, cons.fnt_thick)
 
 # Preprocess frame
 def preprocess(frame):
@@ -23,9 +21,9 @@ def preprocess(frame):
     return frame
 
 # Setup camera or certain video
-def setup_video(name=cons.camera_id):
-    video_name = os.path.join(dirname, name + cons.format_video) if name != cons.camera_id else name
-    cap = cv2.VideoCapture(video_name)
+def setup_video(dir=cons.dir_main, name=cons.camera_id):
+    path = os.path.join(dir, name + cons.format_video) if name != cons.camera_id else name
+    cap = cv2.VideoCapture(path)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, cons.window_width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cons.window_height)
     return cap

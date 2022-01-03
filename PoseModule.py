@@ -32,7 +32,7 @@ class poseDetector():
                                     min_tracking_confidence)
         
         # Init poses dictionary from json file
-        with open(os.path.join(os.path.dirname(__file__), cons.f_poses), 'r') as fp:
+        with open(os.path.join(os.path.dirname(__file__), cons.file_poses), 'r') as fp:
             self.poses = json.load(fp)
 
             # Convert angle from string to tuple
@@ -62,17 +62,12 @@ class poseDetector():
                     angs_draw[ang_ids] = ang
                     #Draw correction if needed
                     if draw:
-
                         # Draw incorrect angle lines.
                         for ang_draw_ids, _ in angs_draw.items():
                             draw_line(img, curr_lmks, 
-                                    points=[ang_draw_ids[0], 
-                                            ang_draw_ids[1], 
-                                            ang_draw_ids[2]], 
-                                    clr=cons.clr_red)
+                                    points=[ang_draw_ids[0], ang_draw_ids[1], ang_draw_ids[2]], clr=cons.clr_red)
             # Return true if all user angles is correct
             return curr_corr_count == len(angles)
-
         except:
             print('Something goes wrong in correct_pose() -> PoseModule')
             return False

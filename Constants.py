@@ -1,7 +1,10 @@
+import os
+import cv2
 import mediapipe as mp
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
+
 
 # Names
 name_app = 'AIgym'
@@ -10,12 +13,16 @@ name_app = 'AIgym'
 format_video = '.mp4'
 
 # Files
-f_poses = 'Model/poses.json'
+dir_main = os.path.dirname(__file__)
+dir_videos = dir_main + '/assets' + '/videos'
+dir_yoga = dir_videos + '/yoga/'
+dir_workout = dir_videos + '/workout/'
+file_poses = 'Model/poses.json'
 
 # Video
 camera_id = 0
-window_width = 960
-window_height = 540
+window_width = 1280 #960
+window_height = 720 #540
 flip_hor = 1
 flip_vert = 0
 flip_both = -1
@@ -84,7 +91,8 @@ lbl_yoga = 'Yoga'
 lbl_workout = 'Workout'
 lbl_correct_limbs = 'Correct red limbs'
 
-# Font Sizes
+# Font 
+font = cv2.FONT_HERSHEY_DUPLEX
 fnt_scale_menu = 1
 fnt_thick = 2
 
