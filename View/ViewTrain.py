@@ -79,3 +79,14 @@ class ViewTrain(View):
             self.paused_backgrd_frame = None
             # Start video from paused state
             self.ctrl.cap_backgrd.set(cv2.CAP_PROP_POS_FRAMES, self.paused_frame_idx)
+
+    def fill_background(self, button, step):
+        # Fill button's background only if accumulated steps are more than 1 otherwise wait \
+        # we need it to handle cases when step is less than one pixel
+        if button.filled_less_one < 1:
+            button.filled_less_one += step
+        else:
+            button.filled_less_one = step
+            button.filled_width += 1
+        if step >= 1:
+            button.filled_width += int(step)
