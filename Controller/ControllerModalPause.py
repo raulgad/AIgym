@@ -23,6 +23,7 @@ class ControllerModalPause(Controller):
         
     def tap_continue(self):
         # Go back to train screen
+        self.super_ctrl.paused = False
         self.super_ctrl.view.pause_background(False)
         router.segue(fr=self)
         

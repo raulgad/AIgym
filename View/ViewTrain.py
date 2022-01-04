@@ -83,6 +83,8 @@ class ViewTrain(View):
     def fill_background(self, button, step):
         # Fill button's background only if accumulated steps are more than 1 otherwise wait \
         # we need it to handle cases when step is less than one pixel
+        
+        # print(button, step)
         if button.filled_less_one < 1:
             button.filled_less_one += step
         else:
