@@ -40,14 +40,14 @@ class ViewTrain(View):
                 if self.paused_backgrd_frame is not None: 
                     self.backgrd_frame = self.paused_backgrd_frame
                 # Repeat video if it's end
-                if not success:
+                if not success and self.paused_backgrd_frame is None:
                     self.ctrl.cap_backgrd.set(cv2.CAP_PROP_POS_FRAMES, 0)
                     _, self.backgrd_frame = self.ctrl.cap_backgrd.read()
                 # Add background frame to segmented user's frame
                 self.add_background()
                 # Show frame with background video under the train's subviews
                 super().appear(self.frame)
-            # Give runtime to the parent controller
+            # Forward runtime to the parent controller
             self.ctrl.run()
 
     def draw_point(self, x, y, clr=cons.clr_red):

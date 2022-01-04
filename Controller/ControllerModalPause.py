@@ -22,8 +22,9 @@ class ControllerModalPause(Controller):
         router.segue(fr=self, to=ControllerMain())
         
     def tap_continue(self):
-        # Go back to train screen
-        self.super_ctrl.paused = False
-        self.super_ctrl.view.pause_background(False)
+        # Unpause train controller only if training time is not end
+        self.super_ctrl.paused = self.super_ctrl.time_left_trng < 1
+        # Unpause background video only if training time is not end
+        self.super_ctrl.view.pause_background(self.super_ctrl.time_left_trng < 1)
         router.segue(fr=self)
         
