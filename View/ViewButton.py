@@ -26,15 +26,16 @@ class ViewButton(View):
         super().__init__()
         self.is_active = True
         self.is_focused = False
-        self.is_tapped = False
         self.time_start_focus = 0
+        self.is_tapped = False
         self.x = x
         self.y = y
         self.x_end = x_end
         self.y_end = y_end
         self.width = self.x_end - self.x
         self.height = self.y_end - self.y
-        self.filled_width = 0
+        self._filled_width = 0
+        self.filled_width_prev = 0
         self.frame_clr = frame_clr
         self.frame_thick = frame_thick
         self.backgr_clr = backgr_clr
@@ -43,6 +44,37 @@ class ViewButton(View):
         # Centerize label.x if needed
         self.label.x = int(self.x + self.width / 2 - self.label.width / 2) if center_label else self.x + cons.vw_bttn_spacing
         self.label.y = int(self.y + self.height / 2 + self.label.height / 2)
+    
+    @property
+    def filled_width(self):
+        return self._filled_width
+
+    @filled_width.setter
+    def filled_width(self, value):
+        # self._filled_width = value
+        # if self._filled_width % 1 >= 0.5:
+        #     self._filled_width = int(self._filled_width + 1)
+        # else:
+        #     self._filled_width = int(value)
+        # print(value, self._filled_width)
+
+        # self._filled_width_prev = value
+        if self.filled_width_prev % 1 >= 0.5:
+            self._filled_width = int(self.filled_width_prev + 1)
+        else:
+            self._filled_width = int(self.filled_width_prev)
+        self.filled_width_prev = self._filled_width + value
+        
+        print(value, self.filled_width_prev, self._filled_width, self.filled_width)
+
+        # rest = value % 1
+        # print(value, rest, self._filled_width)
+        # if rest >= 0.5 and not self._filled_width_changed:
+        #     self._filled_width += 1
+        #     self._filled_width_changed = True
+        # elif rest < 0.5:
+        #     self._filled_width_changed = False
+
 
     def appear(self, frame):
         if self.is_draw:
@@ -50,9 +82,9 @@ class ViewButton(View):
             # eg when modal view is shown
             self.is_active = router.shown(self)
             super().appear(frame)
-            # Handle tapping on the button
+            # Handle tap on the button
             if self.is_active and self.action and self.tapped(): self.action()
-            # Set the one of the buttons is now focused
+            # Set that the one of the buttons is now focused
             ViewButton.one_active = self.is_focused
             
     def draw(self):
@@ -99,7 +131,7 @@ class ViewButton(View):
             # Reinit 'time_start_focus' when user start focus the button
             if not self.time_start_focus:
                 self.time_start_focus = time.time()
-            # Check if user hand is focused certain time on the button 
+            # Check if user's hand is focused certain time on the button 
             time_in_focus = int(time.time() - self.time_start_focus)
             if time_in_focus == cons.time_tap and not self.is_tapped:
                 self.time_start_focus = 0
