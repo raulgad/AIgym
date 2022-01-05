@@ -5,7 +5,6 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
-
 # Names
 name_app = 'AIgym'
 
@@ -17,7 +16,7 @@ dir_main = os.path.dirname(__file__)
 dir_videos = dir_main + '/assets' + '/videos'
 dir_yoga = dir_videos + '/yoga/'
 dir_workout = dir_videos + '/workout/'
-file_poses = 'Model/poses.json'
+file_training = 'Model/training.json'
 
 # Video
 camera_id = 0
@@ -110,5 +109,6 @@ vw_bttn_width = int(0.3 * window_width)
 vw_bttn_height = int(0.185 * window_height)
 vw_bttn_frame_thick = 6
 
-# Angles
+# Training
 ang_pose_detect_gap = 20.0
+exercise_states = ['start', 'end']

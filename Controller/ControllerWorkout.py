@@ -1,8 +1,8 @@
-from Controller.ControllerTrain import ControllerTrain
+from Controller.ControllerTraining import ControllerTraining
 import Constants as cons
 import Extensions as extn
 
-class ControllerWorkout(ControllerTrain):
+class ControllerWorkout(ControllerTraining):
     """
     Responsible for the workout logic
     """

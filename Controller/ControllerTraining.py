@@ -6,7 +6,7 @@ import Constants as cons
 import Extensions as extn
 from Timing import Timing
 
-class ControllerTrain(Controller):
+class ControllerTraining(Controller):
     """
     Responsible for the train logic
     """

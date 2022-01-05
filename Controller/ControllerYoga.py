@@ -1,9 +1,12 @@
+import json
+import os
 import Constants as cons
 import Extensions as extn
-from Controller.ControllerTrain import ControllerTrain
 from Timing import Timing
+from Controller.ControllerTraining import ControllerTraining
+from Model.ModelTraining import ModelTraining
 
-class ControllerYoga(ControllerTrain):
+class ControllerYoga(ControllerTraining):
     """
     Responsible for yoga logic
     """
@@ -11,7 +14,13 @@ class ControllerYoga(ControllerTrain):
         super().__init__()
         # Set background video with coach
         self.cap_backgrd = extn.setup_video(cons.dir_yoga, 't')
+
+        with open(os.path.join(os.path.dirname(__file__), cons.file_training), 'r') as fp:
+            self.data = ModelTraining(json.load(fp))
+            # print(self.data['yoga']['first']['t']['start']['angles'][(16, 14, 12)])
+
         # Set durations
+        self.data
         duration_trng = 7 # * 60 # mins, secs
         duration_pose = 10
         self.time_left_trng = duration_trng
