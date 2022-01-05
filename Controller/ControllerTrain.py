@@ -14,6 +14,7 @@ class ControllerTrain(Controller):
         super().__init__()
         self.cap_backgrd = None
         self.paused = False
+        self.training_active = True
         # Layout train view
         self.view = ViewTrain(ctrl=self)
         # Set callbacks to train buttons actions
@@ -31,7 +32,7 @@ class ControllerTrain(Controller):
         router.segue(fr=self, to=ControllerModalPause(super_ctrl=self), modal=True)
 
     def tap_next(self):
-        if not self.paused:
+        if self.training_active:
             print("tap_next")
             # Set next background video
             self.cap_backgrd = extn.setup_video(cons.dir_yoga, 'warrior')
@@ -51,5 +52,5 @@ class ControllerTrain(Controller):
             self.view.bttn_pause.filled_width = self.view.bttn_pause.width
             self.view.pose_label.text = cons.lbl_time_end
             self.view.bttn_pause.label.text = cons.lbl_pause
-            self.paused = True
+            self.training_active = False
             self.view.pause_background()

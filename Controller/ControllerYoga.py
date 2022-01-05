@@ -24,7 +24,7 @@ class ControllerYoga(ControllerTrain):
         self.timer_pose = Timing()
 
     def run(self):
-        if not self.paused: 
+        if self.training_active and not self.paused: 
             self.train_timing()
 
             # Handle pose timing
