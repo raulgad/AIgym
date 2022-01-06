@@ -4,5 +4,8 @@ class ModelExercise():
     """
     def __init__(self, name):
         self.name = name
-        self.reps = -1
+        self.duration = 0
+        self.reps = 0
         self.states = []
+        # Init current state
+        self.state = None

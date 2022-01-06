@@ -13,20 +13,20 @@ class ControllerYoga(ControllerTraining):
         super().__init__()
         # Set background video with coach
         self.cap_backgrd = extn.setup_video(cons.dir_yoga, 't')
-        # Now we have only two trainings types: 'yoga'->True, and 'workout'->False
+        # For now we have only two trainings types: 'yoga'->True, and 'workout'->False
         self.tng = ModelTraining(type=True)
         self.time_left_tng = self.tng.duration
-        self.time_left_pose = duration_pose
+        self.time_left_pose =  self.tng.curr_exercise.duration
         # Setup button's background filled parts
         self.bttn_pause_fill_step = self.view.bttn_pause.width / self.tng.duration
-        self.bttn_next_fill_step = self.view.bttn_next.width / duration_pose
+        self.bttn_next_fill_step = self.view.bttn_next.width / self.tng.curr_exercise.duration
         self.view.bttn_pause.filled_less_one = self.bttn_pause_fill_step
         self.view.bttn_next.filled_less_one = self.bttn_next_fill_step
         self.timer_pose = Timing()
 
     def run(self):
-        if self.training_active and not self.paused: 
-            self.train_timing()
+        if self.tng_active and not self.paused: 
+            super().run()
 
             # Handle pose timing
             if self.time_left_pose > 0:

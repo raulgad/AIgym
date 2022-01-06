@@ -4,5 +4,5 @@ class ModelExerciseState():
     """
     def __init__(self, name):
         self.name = name
-        self.duration = -1
+        self.duration = 0
         self.angles = {}

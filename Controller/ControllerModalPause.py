@@ -24,6 +24,6 @@ class ControllerModalPause(Controller):
     def tap_continue(self):
         self.super_ctrl.paused = False
         # Unpause background video only if training is not active
-        self.super_ctrl.view.pause_background(not self.super_ctrl.training_active)
+        self.super_ctrl.view.pause_background(not self.super_ctrl.tng_active)
         router.segue(fr=self)
         

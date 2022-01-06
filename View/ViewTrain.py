@@ -83,8 +83,6 @@ class ViewTrain(View):
     def fill_background(self, button, step):
         # Fill button's background only if accumulated steps are more than 1 otherwise wait \
         # we need it to handle cases when step is less than one pixel
-        
-        # print(button, step)
         if button.filled_less_one < 1:
             button.filled_less_one += step
         else:
@@ -92,3 +90,9 @@ class ViewTrain(View):
             button.filled_width += 1
         if step >= 1:
             button.filled_width += int(step)
+
+    def draw_corrections(self, angles):
+        # Draw incorrect user's limbs.
+        for ang_ids, _ in angles.items():
+            self.draw_line(points=[ang_ids[0], ang_ids[1], ang_ids[2]], clr=cons.clr_red)
+        
