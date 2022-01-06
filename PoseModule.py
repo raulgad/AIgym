@@ -32,7 +32,7 @@ class poseDetector():
                                     min_tracking_confidence)
         
         # Init poses dictionary from json file
-        with open(os.path.join(os.path.dirname(__file__), cons.file_poses), 'r') as fp:
+        with open(os.path.join(os.path.dirname(__file__), cons.file_training), 'r') as fp:
             self.poses = json.load(fp)
 
             # Convert angle from string to tuple

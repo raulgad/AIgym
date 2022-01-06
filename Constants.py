@@ -16,7 +16,7 @@ dir_main = os.path.dirname(__file__)
 dir_videos = dir_main + '/assets' + '/videos'
 dir_yoga = dir_videos + '/yoga/'
 dir_workout = dir_videos + '/workout/'
-file_training = 'Model/training.json'
+file_training = 'training.json'
 
 # Video
 camera_id = 0
@@ -98,9 +98,6 @@ time_tap = 1 # seconds
 # Keyboard
 kbrd_quit = 'q'
 
-# Common
-num_big = 1000000000000
-
 # View
 vw_train_circle_rad = 10
 vw_train_circle_filled_rad = 5
@@ -110,5 +107,4 @@ vw_bttn_height = int(0.185 * window_height)
 vw_bttn_frame_thick = 6
 
 # Training
-ang_pose_detect_gap = 20.0
 exercise_states = ['start', 'end']
