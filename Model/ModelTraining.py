@@ -12,12 +12,12 @@ class ModelTraining():
         # Parse data
         with open(os.path.join(os.path.dirname(__file__), cons.file_training), 'r') as fp:
             data = json.load(fp)
-            training_type = 'yoga' if type else 'workout'
-            trainings = data[training_type]
+            trainings = data['yoga' if type else 'workout']
             # Set all training variables
             self.name = ''
             self.duration = -1
             self.exercises = []
+            self.curr_exercise = None
 
             for training_name, exercises in trainings.items():
                 # Set training name
@@ -43,3 +43,5 @@ class ModelTraining():
                                     exer.states.append(exer_state)
                         
                         self.exercises.append(exer)    
+            self.curr_exercise = exercises.pop(0)
+            
