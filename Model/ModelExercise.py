@@ -9,6 +9,16 @@ class ModelExercise():
         self.states = []
         # Init current state
         self.state = None
+        self.state_idx = 0
     
     def set_next_state(self):
-        self.state = self.states.pop(0) if self.states else None
+        if self.state_idx < len(self.states): 
+            self.state = self.states[self.state_idx]
+            self.state_idx += 1
+        else:
+            self.state = None
+    
+    def reset_state(self):
+        self.state_idx = 0
+        self.state = self.states[self.state_idx]
+        

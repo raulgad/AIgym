@@ -15,14 +15,11 @@ class ControllerYoga(ControllerTraining):
         self.tng = ModelTraining(type=True)
         self.dir = cons.dir_yoga
         # Set background video with coach
-        self.cap_backgrd = extn.setup_video(cons.dir_yoga, self.tng.exercise.name)
+        self.cap_backgrd = extn.setup_video(self.dir, self.tng.exercise.name)
         # Set timings
         self.timer_pose = Timing()
         self.set_pose_timings()
-        
-        self.time_left_tng = self.tng.duration
-        self.bttn_pause_fill_step = self.view.bttn_pause.width / self.tng.duration
-        self.view.bttn_pause.filled_less_one = self.bttn_pause_fill_step
+        super().set_tng_timings()
     
     def set_pose_timings(self):
         if self.tng.exercise:

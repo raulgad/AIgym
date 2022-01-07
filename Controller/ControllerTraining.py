@@ -14,10 +14,10 @@ class ControllerTraining(Controller):
         super().__init__()
         self.dir = ''
         self.cap_backgrd = None
-        self.is_corr_pose = False
         self.paused = False
         self.tng = None
         self.tng_active = True
+        self.is_corr_pose = False
         # Layout train view
         self.view = ViewTrain(ctrl=self)
         # Set callbacks to train buttons actions
@@ -42,6 +42,11 @@ class ControllerTraining(Controller):
             if self.tng.exercise: self.update_exercise()
             else: self.done()
 
+    def set_tng_timings(self):
+        self.time_left_tng = self.tng.duration
+        self.bttn_pause_fill_step = self.view.bttn_pause.width / self.tng.duration
+        self.view.bttn_pause.filled_less_one = self.bttn_pause_fill_step
+        
     def done(self):
         self.tng_active = False
         self.view.done()
@@ -79,8 +84,15 @@ class ControllerTraining(Controller):
                 else:
                     self.tng.exercise.set_next_state()
             # Handle when user done all exercise states
-            if not self.tng.exercise.state: self.tng.exercise.reps -= 1
-            # Handle when user done all exercise repetitions
-            if self.tng.exercise.reps <= 0: self.tap_next()
+            if not self.tng.exercise.state:
+                if self.tng.exercise.reps > 0:
+                    self.tng.exercise.reps -= 1
+                    self.tng.exercise.reset_state()
+                # Handle when user done all exercise repetitions
+                else:
+                    self.tap_next()
+                    
+                print(self.tng.exercise.name, self.tng.exercise.reps)
+
             # Handle when user done training
             if not self.tng.exercise: self.done()

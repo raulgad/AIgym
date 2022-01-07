@@ -50,7 +50,7 @@ class ModelTraining():
                         exer.state = exer.states.pop(0)
                         self.exercises.append(exer)
             self.exercise = self.exercises.pop(0)
-            
+    
     def set_next_exercise(self):
         if self.exercises: 
             self.exercise = self.exercises.pop(0) 
