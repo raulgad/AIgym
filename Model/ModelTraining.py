@@ -51,6 +51,14 @@ class ModelTraining():
                         self.exercises.append(exer)
             self.exercise = self.exercises.pop(0)
             
+    def set_next_exercise(self):
+        if self.exercises: 
+            self.exercise = self.exercises.pop(0) 
+            # Set exercise duration
+            for state in self.exercise.states: self.exercise.duration += state.duration
+        else:   
+            self.exercise = None
+
     def find_angle(self, points):
         # Get the coordinates
         x1, y1, _ = detector.lmks[points[0]]

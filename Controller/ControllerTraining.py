@@ -12,7 +12,9 @@ class ControllerTraining(Controller):
     """
     def __init__(self):
         super().__init__()
+        self.dir = ''
         self.cap_backgrd = None
+        self.is_corr_pose = False
         self.paused = False
         self.tng = None
         self.tng_active = True
@@ -26,6 +28,8 @@ class ControllerTraining(Controller):
         self.view.bttn_pause.filled_less_one = 0
         self.time_left_tng = 0
         self.timer_tng = Timing()
+        self.time_exer_state = 0
+        self.timer_exer_state = Timing()
 
     def tap_pause(self):
         self.paused = True
@@ -34,8 +38,17 @@ class ControllerTraining(Controller):
 
     def tap_next(self):
         if self.tng_active:
-            # Set next background video
-            self.cap_backgrd = extn.setup_video(cons.dir_yoga, 'warrior')
+            self.tng.set_next_exercise()
+            if self.tng.exercise: self.update_exercise()
+            else: self.done()
+
+    def done(self):
+        self.tng_active = False
+        self.view.done()
+    
+    def update_exercise(self):
+        self.view.bttn_next.filled_width = 0
+        self.cap_backgrd = extn.setup_video(self.dir, self.tng.exercise.name)
 
     def run(self):
         if self.tng_active and not self.paused:
@@ -50,33 +63,24 @@ class ControllerTraining(Controller):
                     self.view.fill_background(self.view.bttn_pause, self.bttn_pause_fill_step)
             # Handle when training time is end
             else:
-                self.view.bttn_pause.filled_width = self.view.bttn_pause.width
-                self.view.exercise_label.text = cons.lbl_time_end
-                self.view.bttn_pause.label.text = cons.lbl_pause
                 self.tng_active = False
-                self.view.pause_background()
+                self.view.tng_time_end()
             # Detect pose
             incorr_angs = self.tng.incorr_angs(self.tng.exercise.state.angles)
-            is_corr_pose = not incorr_angs
+            self.is_corr_pose = not incorr_angs
             # Update view according to analyzed pose
             self.view.draw_corrections(incorr_angs)
-            self.view.update_label(self.tng.exercise.name, is_corr_pose)
-            
-
-    # def tng_timing(self):
-    #     # Handle training timing
-    #     if self.time_left_tng > 0:
-    #         # Check if one second has passed
-    #         if self.timer_tng.ticker():
-    #             # Update pause button view
-    #             self.time_left_tng -= 1
-    #             trng_mins, trng_secs = divmod(self.time_left_tng, 60)
-    #             self.view.bttn_pause.label.text = cons.lbl_pause + ' {:02d}:{:02d}'.format(trng_mins, trng_secs)
-    #             self.view.fill_background(self.view.bttn_pause, self.bttn_pause_fill_step)
-    #     # Handle when training time is end
-    #     else:
-    #         self.view.bttn_pause.filled_width = self.view.bttn_pause.width
-    #         self.view.pose_label.text = cons.lbl_time_end
-    #         self.view.bttn_pause.label.text = cons.lbl_pause
-    #         self.tng_active = False
-    #         self.view.pause_background()
+            self.view.update_label(self.tng.exercise.name, self.is_corr_pose)
+            # Handle when user stands in correct pose
+            if self.is_corr_pose:
+                if self.time_exer_state > 0:
+                    # Decrease each second exercise state duration
+                    if self.timer_exer_state.ticker(): self.time_exer_state -= 1
+                else:
+                    self.tng.exercise.set_next_state()
+            # Handle when user done all exercise states
+            if not self.tng.exercise.state: self.tng.exercise.reps -= 1
+            # Handle when user done all exercise repetitions
+            if self.tng.exercise.reps <= 0: self.tap_next()
+            # Handle when user done training
+            if not self.tng.exercise: self.done()

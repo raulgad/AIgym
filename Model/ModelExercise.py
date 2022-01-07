@@ -9,3 +9,6 @@ class ModelExercise():
         self.states = []
         # Init current state
         self.state = None
+    
+    def set_next_state(self):
+        self.state = self.states.pop(0) if self.states else None

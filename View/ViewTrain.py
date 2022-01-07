@@ -81,8 +81,7 @@ class ViewTrain(View):
             self.ctrl.cap_backgrd.set(cv2.CAP_PROP_POS_FRAMES, self.paused_frame_idx)
 
     def fill_background(self, button, step):
-        # Fill button's background only if accumulated steps are more than 1 otherwise wait \
-        # we need it to handle cases when step is less than one pixel
+        # Fill button's background only if accumulated steps are more than 1 pixel otherwise wait.
         if button.filled_less_one < 1:
             button.filled_less_one += step
         else:
@@ -101,3 +100,15 @@ class ViewTrain(View):
         self.exercise_label.text = (exercise_name.capitalize() + cons.lbl_pose) if is_corr_pose else cons.lbl_correct_limbs
         # Change exercise label color
         self.exercise_label.color = cons.clr_green if is_corr_pose else cons.clr_red
+    
+    def tng_time_end(self):
+        self.bttn_pause.filled_width = self.bttn_pause.width
+        self.exercise_label.text = cons.lbl_time_end
+        self.bttn_pause.label.text = cons.lbl_pause
+        self.pause_background()
+
+    def done(self):
+        self.bttn_next.filled_width = self.bttn_next.width
+        self.exercise_label.text = cons.lbl_done
+        self.exercise_label.color = cons.clr_green
+        self.pause_background()
