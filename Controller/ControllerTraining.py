@@ -51,14 +51,17 @@ class ControllerTraining(Controller):
             # Handle when training time is end
             else:
                 self.view.bttn_pause.filled_width = self.view.bttn_pause.width
-                self.view.pose_label.text = cons.lbl_time_end
+                self.view.exercise_label.text = cons.lbl_time_end
                 self.view.bttn_pause.label.text = cons.lbl_pause
                 self.tng_active = False
                 self.view.pause_background()
-            
+            # Detect pose
             incorr_angs = self.tng.incorr_angs(self.tng.exercise.state.angles)
             is_corr_pose = not incorr_angs
+            # Update view according to analyzed pose
             self.view.draw_corrections(incorr_angs)
+            self.view.update_label(self.tng.exercise.name, is_corr_pose)
+            
 
     # def tng_timing(self):
     #     # Handle training timing

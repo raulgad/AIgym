@@ -16,10 +16,10 @@ class ControllerYoga(ControllerTraining):
         # For now we have only two trainings types: 'yoga'->True, and 'workout'->False
         self.tng = ModelTraining(type=True)
         self.time_left_tng = self.tng.duration
-        self.time_left_pose =  self.tng.curr_exercise.duration
+        self.time_left_pose =  self.tng.exercise.duration
         # Setup button's background filled parts
         self.bttn_pause_fill_step = self.view.bttn_pause.width / self.tng.duration
-        self.bttn_next_fill_step = self.view.bttn_next.width / self.tng.curr_exercise.duration
+        self.bttn_next_fill_step = self.view.bttn_next.width / self.tng.exercise.duration
         self.view.bttn_pause.filled_less_one = self.bttn_pause_fill_step
         self.view.bttn_next.filled_less_one = self.bttn_next_fill_step
         self.timer_pose = Timing()

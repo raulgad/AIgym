@@ -40,37 +40,7 @@ class poseDetector():
             for _, pose in self.poses.items():
                 pose['start']['angles'] = {eval(k):v for k,v in pose['start']['angles'].items()}
 
-    def correct_pose(self, img, curr_lmks, angles, angle_gap = cons.ang_pose_detect_gap, draw=False):
-        # Init variable of user's current correct angles
-        curr_corr_count = 0
-        # Init dictionary of user's current not correct angles
-        angs_draw = {}
-        try:
-            # Check each current angle if it's same as correct
-            for ang_ids, ang in angles.items():
-                # Get current user's angle from it's points
-                curr_ang = self.find_angle(ang_ids, curr_lmks)
-                # Check if current user angle is in suitable range
-                if abs(curr_ang - ang) <= angle_gap:
-                    curr_corr_count += 1
-                    # Remove the angle that has become correct, for not drawing it later
-                    if ang_ids in angs_draw:
-                        del angs_draw[ang_ids]
-                # Add angle that user should do
-                else:
-                    curr_corr_count -= 1
-                    angs_draw[ang_ids] = ang
-                    #Draw correction if needed
-                    if draw:
-                        # Draw incorrect angle lines.
-                        for ang_draw_ids, _ in angs_draw.items():
-                            draw_line(img, curr_lmks, 
-                                    points=[ang_draw_ids[0], ang_draw_ids[1], ang_draw_ids[2]], clr=cons.clr_red)
-            # Return true if all user angles is correct
-            return curr_corr_count == len(angles)
-        except:
-            print('Something goes wrong in correct_pose() -> PoseModule')
-            return False
+
  
     def analyze(self, img):
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

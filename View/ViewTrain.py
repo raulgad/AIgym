@@ -23,12 +23,12 @@ class ViewTrain(View):
         self.bttn_next = extn.layout_corner_bttn(left=False, label=cons.lbl_next, backgr_clr=cons.clr_gray)
         self.add_subview(self.bttn_pause)
         self.add_subview(self.bttn_next)
-        # Layout pose label
-        self.pose_label = ViewLabel(color=cons.clr_red, text=cons.lbl_correct_limbs)
-        self.pose_label.y = self.bttn_pause.label.y
-        # Horizontally centerize pose label
-        self.pose_label.x = int(self.width / 2 - self.pose_label.width / 2)
-        self.add_subview(self.pose_label)
+        # Layout exercise label
+        self.exercise_label = ViewLabel(color=cons.clr_red, text=cons.lbl_correct_limbs)
+        self.exercise_label.y = self.bttn_pause.label.y
+        # Horizontally centerize exercise label
+        self.exercise_label.x = int(self.width / 2 - self.exercise_label.width / 2)
+        self.add_subview(self.exercise_label)
 
     def appear(self, frame):
         if self.is_draw:
@@ -58,12 +58,12 @@ class ViewTrain(View):
         for p_idx, point in enumerate(points):
             # Draw first point
             x1, y1, _ = detector.lmks[point]
-            self.draw_point(self.frame, x1, y1, clr=point_clr)
+            self.draw_point(x1, y1, clr=point_clr)
             # Draw line to next point
             if p_idx + 1 < len(points):
                 x2, y2, _ = detector.lmks[points[p_idx + 1]]
                 cv2.line(self.frame, (x1, y1), (x2, y2), clr, cons.fnt_thick)
-                self.draw_point(self.frame, x2, y2, clr=point_clr)
+                self.draw_point(x2, y2, clr=point_clr)
 
     def add_background(self):
         # Add background frame to segmented user's frame
@@ -95,4 +95,9 @@ class ViewTrain(View):
         # Draw incorrect user's limbs.
         for ang_ids, _ in angles.items():
             self.draw_line(points=[ang_ids[0], ang_ids[1], ang_ids[2]], clr=cons.clr_red)
-        
+    
+    def update_label(self, exercise_name, is_corr_pose):
+        # Change exercise label
+        self.exercise_label.text = (exercise_name.capitalize() + cons.lbl_pose) if is_corr_pose else cons.lbl_correct_limbs
+        # Change exercise label color
+        self.exercise_label.color = cons.clr_green if is_corr_pose else cons.clr_red
