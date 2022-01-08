@@ -26,3 +26,4 @@ class ViewModalPause(View):
                     label=ViewLabel(text=cons.lbl_continue), center_label=True)
         self.add_subview(self.bttn_exit)
         self.add_subview(self.bttn_continue)
+        

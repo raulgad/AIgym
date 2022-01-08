@@ -28,3 +28,4 @@ class ViewLabel(View):
 
     def draw(self):
         cv2.putText(self.frame, self.text, (self.x, self.y), self.font, self.scale, self.color, self.thick)
+        

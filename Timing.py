@@ -11,3 +11,4 @@ class Timing:
         if time.localtime(time.time() - self.prev_time)[tm] >= value:
             self.prev_time = time.time()
             return True
+            

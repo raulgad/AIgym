@@ -20,8 +20,8 @@ file_training = 'training.json'
 
 # Video
 camera_id = 0
-window_width = 1280 #960
-window_height = 720 #540
+window_width = 960
+window_height = 540
 flip_hor = 1
 flip_vert = 0
 flip_both = -1

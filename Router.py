@@ -26,7 +26,5 @@ def shown(view):
     # Get main view of the controller
     main_view = view.super if view.super else view
     # Return if view is shown as a main view on the screen
-    if root.modal:
-        return root.modal.view == main_view
-    else:
-        return root.view == main_view
+    if root.modal: return root.modal.view == main_view
+    else: return root.view == main_view

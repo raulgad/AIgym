@@ -87,8 +87,7 @@ class ViewTrain(View):
         else:
             button.filled_less_one = step
             button.filled_width += 1
-        if step >= 1:
-            button.filled_width += int(step)
+        if step >= 1: button.filled_width += int(step)
 
     def draw_corrections(self, angles):
         # Draw incorrect user's limbs.

@@ -82,3 +82,4 @@ class ModelTraining():
         except:
             logging.debug('Something goes wrong in correct_pose() -> ModelTraining')
             return incorr_angs
+            

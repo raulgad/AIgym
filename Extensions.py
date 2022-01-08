@@ -42,4 +42,3 @@ def layout_corner_bttn(left=True, top=True, label="", center_label=True, backgr_
     return ViewButton(x=x, y=y, x_end=x_end, y_end=y_end, 
                     label=ViewLabel(text=label), 
                     center_label=center_label, backgr_clr=backgr_clr)
-

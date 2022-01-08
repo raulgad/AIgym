@@ -1,6 +1,5 @@
 from View.ViewModalPause import ViewModalPause
 from Controller.Controller import Controller
-
 import Router as router
 
 class ControllerModalPause(Controller):

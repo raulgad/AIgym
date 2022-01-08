@@ -28,16 +28,10 @@ def main():
             # Show modal view
             if router.root.modal: router.root.modal.view.appear(router.root.view.frame)
             # Render frame
-            try:
-                
-                extn.draw_fps(router.root.view.frame)
-
-                cv2.imshow(cons.name_app, router.root.view.frame)
-            except:
-                logging.debug('Cant render the frame -> cv2.imshow()')
+            try: cv2.imshow(cons.name_app, router.root.view.frame)
+            except: logging.debug('Cant render the frame -> cv2.imshow()')
             # Quit from the app when user tap on keyboard
             if extn.is_quit(): break
-
         else:
             logging.debug('Cant read frame from the camera -> cap.read()')
             break

@@ -25,3 +25,4 @@ class View:
     
     def draw(self):
         pass
+    
