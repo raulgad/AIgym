@@ -35,7 +35,7 @@ class ModelTraining():
                         for state_name, exercise_state in _exercise.items():
                             if state_name == 'reps':
                                 # Set first exercise repititions if it exists
-                                exer.reps = exercise_state - 1 if exercise_state else exercise_state
+                                exer.reps = exercise_state
                             else:
                                 # Add exercise state if state has angles
                                 if exercise_state['angles']:
@@ -51,12 +51,8 @@ class ModelTraining():
             self.exercise = self.exercises.pop(0)
     
     def set_next_exercise(self):
-        if self.exercises: 
-            self.exercise = self.exercises.pop(0) 
-            # Set exercise duration
-            for state in self.exercise.states: self.exercise.duration += state.duration
-        else:   
-            self.exercise = None
+        if self.exercises: self.exercise = self.exercises.pop(0)
+        else: self.exercise = None
 
     def find_angle(self, points):
         # Get the coordinates

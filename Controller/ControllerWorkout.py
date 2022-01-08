@@ -18,7 +18,7 @@ class ControllerWorkout(ControllerTraining):
         self.set_reps_views()
     
     def set_reps_views(self):
-        self.bttn_next_fill_step = self.view.bttn_next.width / (self.tng.exercise.reps + 1)
+        self.bttn_next_fill_step = self.view.bttn_next.width / self.tng.exercise.reps
         self.view.bttn_next.filled_less_one = self.bttn_next_fill_step
 
     def run(self):

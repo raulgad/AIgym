@@ -5,7 +5,6 @@ import mediapipe as mp
 """
 Responsible for detecting
 """
-
 mpipepose = None
 lmks = [-1] * len(mp.solutions.pose.PoseLandmark)
 segmentation_mask = []
@@ -29,9 +28,6 @@ def analyze_user(frame):
     segmentation_mask = results.segmentation_mask
     try:
         if results.pose_landmarks:
-            
-            mp.solutions.drawing_utils.draw_landmarks(frame, results.pose_landmarks,
-                                           mp.solutions.pose.POSE_CONNECTIONS)
             # Get coordinates of the landmarks according to the screen size
             for idx, lm in enumerate(results.pose_landmarks.landmark):
                 height, width, _ = frame.shape

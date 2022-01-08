@@ -88,9 +88,9 @@ class ControllerTraining(Controller):
             # Handle when user done all exercise states
             self.done_exer_states = self.tng.exercise.state is None
             if not self.tng.exercise.state:
+                self.tng.exercise.reps -=1
                 if self.tng.exercise.reps > 0:
                     self.done_exer_reps = False
-                    self.tng.exercise.reps -= 1
                     self.tng.exercise.reset_state()
                 # Handle when user done all exercise repetitions
                 else:
