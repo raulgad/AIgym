@@ -35,8 +35,8 @@ class ModelTraining():
                         exer = ModelExercise(exercise_name)
                         for state_name, exercise_state in _exercise.items():
                             if state_name == 'reps':
-                                # Set exercise repititions
-                                exer.reps = exercise_state
+                                # Set first exercise repititions if it exists
+                                exer.reps = exercise_state - 1 if exercise_state else exercise_state
                             else:
                                 # Add exercise state if state has angles
                                 if exercise_state['angles']:
@@ -47,7 +47,7 @@ class ModelTraining():
                                     exer.states.append(exer_state)
                                     # Increase exercise duration
                                     exer.duration += exer_state.duration
-                        exer.state = exer.states.pop(0)
+                        exer.state = exer.states[0]
                         self.exercises.append(exer)
             self.exercise = self.exercises.pop(0)
     

@@ -12,9 +12,9 @@ class ModelExercise():
         self.state_idx = 0
     
     def set_next_state(self):
-        if self.state_idx < len(self.states): 
-            self.state = self.states[self.state_idx]
+        if self.state_idx + 1 < len(self.states): 
             self.state_idx += 1
+            self.state = self.states[self.state_idx]
         else:
             self.state = None
     

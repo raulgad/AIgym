@@ -91,8 +91,5 @@ class ControllerTraining(Controller):
                 # Handle when user done all exercise repetitions
                 else:
                     self.tap_next()
-                    
-                print(self.tng.exercise.name, self.tng.exercise.reps)
-
             # Handle when user done training
             if not self.tng.exercise: self.done()
