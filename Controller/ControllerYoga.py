@@ -16,10 +16,10 @@ class ControllerYoga(ControllerTraining):
         self.dir = cons.dir_yoga
         # Set background video with coach
         self.cap_backgrd = extn.setup_video(self.dir, self.tng.exercise.name)
-        # Set timings
+        super().set_tng_timings()
+        # Set pose timings
         self.timer_pose = Timing()
         self.set_pose_timings()
-        super().set_tng_timings()
     
     def set_pose_timings(self):
         if self.tng.exercise:

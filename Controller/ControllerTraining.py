@@ -18,6 +18,8 @@ class ControllerTraining(Controller):
         self.tng = None
         self.tng_active = True
         self.is_corr_pose = False
+        self.done_exer_states = False
+        self.done_exer_reps = False
         # Layout train view
         self.view = ViewTrain(ctrl=self)
         # Set callbacks to train buttons actions
@@ -84,12 +86,15 @@ class ControllerTraining(Controller):
                 else:
                     self.tng.exercise.set_next_state()
             # Handle when user done all exercise states
+            self.done_exer_states = self.tng.exercise.state is None
             if not self.tng.exercise.state:
                 if self.tng.exercise.reps > 0:
+                    self.done_exer_reps = False
                     self.tng.exercise.reps -= 1
                     self.tng.exercise.reset_state()
                 # Handle when user done all exercise repetitions
                 else:
+                    self.done_exer_reps = True
                     self.tap_next()
             # Handle when user done training
             if not self.tng.exercise: self.done()

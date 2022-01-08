@@ -19,10 +19,9 @@ class ModelTraining():
             # Set all training variables
             self.name = ''
             self.duration = 0
+            # Init current trainings and exercises
             self.exercises = []
-            # Init current exercise
             self.exercise = None
-
             for training_name, exercises in trainings.items():
                 # Set training name
                 self.name = training_name
@@ -67,7 +66,7 @@ class ModelTraining():
         # Calculate the angle between three coordinates
         return abs(math.degrees(math.atan2(y3 - y2, x3 - x2) - math.atan2(y1 - y2, x1 - x2)))
     
-    def incorr_angs(self, angles, angle_gap = 20):
+    def incorr_angs(self, angles, angle_gap = 30):
         # Init dictionary of user's current incorrect angles
         incorr_angs = {}
         try:

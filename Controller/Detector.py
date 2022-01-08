@@ -32,7 +32,6 @@ def analyze_user(frame):
             
             mp.solutions.drawing_utils.draw_landmarks(frame, results.pose_landmarks,
                                            mp.solutions.pose.POSE_CONNECTIONS)
-
             # Get coordinates of the landmarks according to the screen size
             for idx, lm in enumerate(results.pose_landmarks.landmark):
                 height, width, _ = frame.shape
