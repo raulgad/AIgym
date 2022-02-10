@@ -26,7 +26,4 @@
 - Incorrect pose indication through user's body lines.
 
 
-#### This project was completed in 10 days by:
-- https://github.com/raulgad
-- https://github.com/AugustVIII
-- https://github.com/samot-samoe
+#### This project was completed in 10 days.
